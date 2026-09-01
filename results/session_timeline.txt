@@ -1,0 +1,46 @@
+when                        capability                     evidence
+2026-09-01T13:03:58-04:00  2017 agent, all 96            acc_all=35.4%
+2026-09-01T13:08:12-04:00  non-LLM, rule vote only       TOTAL 55/96
+2026-09-01T13:09:05-04:00  non-LLM, learned (CV)         [learned] leave-one-SET-out (C=0.003) : 59/96
+2026-09-01T13:09:05-04:00  non-LLM, no training          [baseline] confidence-weighted rule voting, no training : 55/96
+2026-09-01T13:12:58-04:00  non-LLM, learned (CV)         [learned] leave-one-SET-out (C=0.1) : 57/96
+2026-09-01T13:12:58-04:00  non-LLM, no training          [baseline] confidence-weighted rule voting, no training : 56/96
+2026-09-01T13:16:06-04:00  non-LLM, rule vote only       TOTAL 53/96
+2026-09-01T13:17:39-04:00  non-LLM, rule vote only       TOTAL 47/96
+2026-09-01T13:22:09-04:00  non-LLM, learned (nested CV)  [B] rule search + learned ranker  : 59/96
+2026-09-01T13:22:09-04:00  non-LLM, no training          [A] rule search only, no training : 49/96
+2026-09-01T13:31:36-04:00  non-LLM, learned (nested CV)  [B] rule search + learned ranker  : 59/96
+2026-09-01T13:31:36-04:00  non-LLM, no training          [A] rule search only, no training : 49/96
+2026-09-01T13:48:53-04:00  non-LLM, learned (nested CV)  [B] rule search + learned ranker  : 59/96
+2026-09-01T13:48:53-04:00  non-LLM, no training          [A] rule search only, no training : 49/96
+2026-09-01T14:08:31-04:00  2017 agent, all 96            acc_all=35.4%
+2026-09-01T14:08:31-04:00  non-LLM, learned (CV)         [learned] leave-one-SET-out (C=0.003) : 59/96
+2026-09-01T14:08:31-04:00  non-LLM, learned (CV)         [learned] leave-one-SET-out (C=0.1) : 57/96
+2026-09-01T14:08:31-04:00  non-LLM, learned (nested CV)  [B] rule search + learned ranker  : 59/96
+2026-09-01T14:08:31-04:00  non-LLM, learned (nested CV)  [B] rule search + learned ranker  : 59/96
+2026-09-01T14:08:31-04:00  non-LLM, learned (nested CV)  [B] rule search + learned ranker  : 59/96
+2026-09-01T14:08:31-04:00  non-LLM, no training          [A] rule search only, no training : 49/96
+2026-09-01T14:08:31-04:00  non-LLM, no training          [A] rule search only, no training : 49/96
+2026-09-01T14:08:31-04:00  non-LLM, no training          [A] rule search only, no training : 49/96
+2026-09-01T14:08:31-04:00  non-LLM, rule vote only       TOTAL 47/96
+2026-09-01T14:08:31-04:00  non-LLM, rule vote only       TOTAL 53/96
+2026-09-01T14:08:31-04:00  non-LLM, rule vote only       TOTAL 55/96
+2026-09-01T14:09:08-04:00  2017 agent, all 96            acc_all=35.4%
+2026-09-01T14:09:08-04:00  2017 agent, all 96            acc_all=35.4%
+2026-09-01T14:09:08-04:00  non-LLM, learned (CV)         [learned] leave-one-SET-out (C=0.003) : 59/96
+2026-09-01T14:09:08-04:00  non-LLM, learned (CV)         [learned] leave-one-SET-out (C=0.003) : 59/96
+2026-09-01T14:09:08-04:00  non-LLM, learned (CV)         [learned] leave-one-SET-out (C=0.1) : 57/96
+2026-09-01T14:09:08-04:00  non-LLM, learned (CV)         [learned] leave-one-SET-out (C=0.1) : 57/96
+2026-09-01T14:09:08-04:00  non-LLM, learned (nested CV)  [B] rule search + learned ranker  : 59/96
+2026-09-01T14:09:08-04:00  non-LLM, learned (nested CV)  [B] rule search + learned ranker  : 59/96
+2026-09-01T14:09:08-04:00  non-LLM, learned (nested CV)  [B] rule search + learned ranker  : 59/96
+2026-09-01T14:09:08-04:00  non-LLM, learned (nested CV)  [B] rule search + learned ranker  : 59/96
+2026-09-01T14:09:08-04:00  non-LLM, learned (nested CV)  [B] rule search + learned ranker  : 59/96
+2026-09-01T14:09:08-04:00  non-LLM, no training          [A] rule search only, no training : 49/96
+2026-09-01T14:09:08-04:00  non-LLM, no training          [A] rule search only, no training : 49/96
+2026-09-01T14:09:08-04:00  non-LLM, no training          [A] rule search only, no training : 49/96
+2026-09-01T14:09:08-04:00  non-LLM, no training          [baseline] confidence-weighted rule voting, no training : 55/96
+2026-09-01T14:09:08-04:00  non-LLM, no training          [baseline] confidence-weighted rule voting, no training : 56/96
+2026-09-01T14:09:08-04:00  non-LLM, rule vote only       TOTAL 47/96
+2026-09-01T14:09:08-04:00  non-LLM, rule vote only       TOTAL 53/96
+2026-09-01T14:09:08-04:00  non-LLM, rule vote only       TOTAL 55/96

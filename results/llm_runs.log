@@ -315,3 +315,16 @@ gpt-5 (effort=high) on 96 problems, 10 workers
   [ 93/96] OK  Challenge Problem E-01     said 6 truth 6 (19392 rtok, 272.62s)
   [ 94/96] --  Challenge Problem E-09     said 2 truth 1 (12032 rtok, 233.31s)
   [ 95/96] --  Challenge Problem E-08     said 5 truth 7 (14720 rtok, 250.15s)
+  [ 96/96] --  Challenge Problem E-10     said 2 truth 1 (24576 rtok, 1060.6s)
+
+gpt-5: 84/96 = 87.5%   wall 1773s   api errors 0
+  Basic Problems B           11/12
+  Basic Problems C           12/12
+  Basic Problems D           12/12
+  Basic Problems E           11/12
+  Challenge Problems B        8/12
+  Challenge Problems C       12/12
+  Challenge Problems D        9/12
+  Challenge Problems E        9/12
+  tokens: 383,928 in, 484,800 out (474,880 reasoning)
+wrote /Users/bcollier/Code/ravensdemo/claude-ravens-demo/03_llm/../results/llm_gpt_5_answers.csv

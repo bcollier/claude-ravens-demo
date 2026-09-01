@@ -54,30 +54,111 @@ were tuned against. It holds up on Basic C/D/E (7–8 of 12) and falls apart on 
 Challenge sets it never saw (2/12 on Challenge D). That is the classic symptom of
 hand-tuned weights: it generalises about as far as the data it was tuned on.
 
-## How it works
+## What the code is actually doing
 
-Seven pixel statistics, each turned into a 1–10 score per answer option, then
-combined with hand-set weights:
+Strip away the plumbing and the agent is one idea applied seven ways:
 
-- **DPR** — dark-pixel ratio. Extrapolates a linear trend along the row (`H + (H-G)`),
-  the column (`F + (F-C)`) and the diagonal, and scores each option by how close
-  its ink coverage is to the prediction.
-- **IPR** — intersection-pixel ratio. How much ink two panels share, normalised.
-  Assumes the G↔H relationship should repeat as H↔answer.
-- **Identity check** — if a row, column or diagonal is unchanged, prefer options
-  identical to the last cell; otherwise *eliminate* options identical to any given.
-- **Dark-pixel centroid** — where the ink sits, extrapolated the same way. Computed,
-  then given weight `0.0`.
-- **Object count** — from the verbal representation. Computed, then disabled entirely
-  ("No longer used in Project 3").
-- **Image addition** — if `A+B=C` and `D+E=F` as pixel unions, look for `G+H=answer`.
-  Skipped for set D by an explicit name check.
-- Subtraction and intersection appear as column headers and weights, but are never
-  populated. They contribute zero.
+> Reduce each 184&times;184 panel to a single number. Extrapolate that number
+> along the row, the column and the diagonal. Score each answer option by how
+> close it lands to the prediction. Add the scores up with fixed weights and
+> take the best.
 
-The pixel loops are pure Python `getpixel` calls — the author's comment says as
-much ("it is not the most efficient way to do it obviously"). It is still only
-~0.5 s per problem, 34 s for all 96.
+The seven measurements:
+
+| # | statistic | what it computes | weight in the final score |
+|---|---|---|---|
+| 1 | **DPR** — dark pixel ratio | fraction of the panel that is inked | row 0.50, col 0.20, diag 0.50 |
+| 2 | **IPR** — intersection pixel ratio | `2 × shared ink / (ink A + ink B)`, i.e. the Dice coefficient | row 0.10\*, col 0.10, diag 0.15\* |
+| 3 | **identity check** | is a row/col/diagonal unchanged? then prefer options identical to the last cell | 5 |
+| 4 | **elimination** | if a line is *not* unchanged, penalise options identical to any visible panel | −10 |
+| 5 | **image addition** | if `A ∪ B = C` and `D ∪ E = F`, look for `G ∪ H = answer` | 5 |
+| 6 | **dark pixel centroid** | where the ink sits, extrapolated the same way | **0** |
+| 7 | **object count** | number of objects, from the verbal representation | **0** |
+
+\* see the bugs section — the row IPR weight is never actually applied and the
+diagonal one is applied as `1.0`.
+
+Extrapolation is always the same linear step: `predict = last + (last − first)`.
+For a row that is `H + (H − G)`; for a column `F + (F − C)`. Subtraction and
+intersection have column headers, constants and weights reserved for them, but
+are never populated — they contribute zero.
+
+## What was effective
+
+Four of the ideas in this file are the right ideas, and all four survive into
+the much larger agent in `02_classical_ai/` as whole rule families.
+
+**Comparing relationships rather than objects (IPR).** The agent does not ask
+"which option looks like H"; it asks "is the H→option relationship the same as
+the G→H relationship". That is analogy at the right level of abstraction, and it
+is not the obvious first thing to try. In the rebuilt agent this became the
+`simpat` family — and the learned ranker gives it one of the largest positive
+weights of any of the 22 families. A 2017 student project found by hand the
+feature a fitted model would later rank near the top.
+
+**Elimination as a hard negative.** If nothing in the matrix repeats, then an
+option that is pixel-identical to a panel you can already see is probably a
+distractor. That is a *constraint*, not a score, and mixing constraints with
+scores is the correct instinct. The rebuilt agent carries the same signal as
+`dup_max`, and its learned weight is large and **negative** — independently
+confirming the 2017 judgement.
+
+**Pixel set algebra (image addition).** Testing `A ∪ B = C` on the rows you can
+see before applying it to the row you cannot is exactly the generate-and-test
+structure the rebuilt agent uses everywhere. Problem set E is built almost
+entirely on this, and the union is the single most common case.
+
+**Linear extrapolation of a measured property.** `H + (H − G)` is a real
+hypothesis about how a matrix progresses, and it is right often enough to carry
+sets C and D. The rebuilt agent's `num` family is this same idea over eight
+measurements instead of one, with the step estimated from the visible rows
+rather than assumed.
+
+It is also worth saying plainly: the code is readable, honestly commented, and
+it still runs eight years later with no changes. That is not nothing.
+
+## What was lacking
+
+**Representation — the ceiling.** Every statistic collapses a panel to one
+number. Two panels with identical ink coverage are, to this agent, the same
+panel. That makes an entire class of rule literally inexpressible: *the inner
+shape rotates while the outer frame stays put*, *each row contains a circle, a
+square and a triangle in some order*. Problem set D is built on exactly those
+compositional rules, and no reweighting of seven scalars can reach them. The
+rebuilt agent's first real gain came from decomposing a panel into an outer
+silhouette, a largest component, a smallest component and an interior — at which
+point the Latin-square rules in set D become checkable.
+
+**No per-problem rule selection — the mechanism of the ceiling.** The weights
+are constants. Every problem is scored with the same blend of DPR, IPR, identity
+and addition, whether or not those rules have anything to do with it. There is
+no step that asks *which rule is in force here?*
+
+The rebuilt agent measured what that costs. `diagnose.py` scores the strategy of
+picking the single highest-scoring rule and believing it, across a rule space
+hundreds of times larger than this one: **34/96**. The 2017 agent scores
+**34/96**. The equality of the two numbers is a coincidence; what it points at
+is not. Applying one fixed scoring scheme to every problem lands in the
+mid-thirties almost regardless of how good the individual measurements are.
+Choosing per problem is where the remaining sixty points live.
+
+**No validation signal.** Nothing in the file asks whether a rule actually holds
+for the problem in front of it. `check_addition` comes closest — it verifies
+`A ∪ B = C` on the visible rows first — but its result is a boolean gate, not a
+score, and the other six statistics are applied unconditionally. Without a
+per-problem measure of "is this rule any good here", tuning has nowhere to go
+except global weights, and global weights are tuned by running the whole set and
+nudging. Which is what happened, and why the bugs below did not matter.
+
+**Tuned on a quarter of the test.** The upstream `ProblemSetList.txt` lists only
+Basic D and Basic E. The results show it: 7–8 of 12 on the Basic sets, 2 of 12
+on Challenge D.
+
+**Unfinished coverage.** 2&times;2 problems return `-1`. Subtraction and
+intersection are declared but never written. Centroid and object count are
+computed in full and then multiplied by zero. These are the fingerprints of a
+graded course project meeting a deadline, not a design flaw — but they cost 24
+problems outright.
 
 ## Two real bugs in the scoring expression
 

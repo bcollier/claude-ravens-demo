@@ -9,7 +9,13 @@ how far the same problem gets you across three eras of technique:
 | 2 | [`02_classical_ai/`](02_classical_ai/) | symbolic rule search + classical CV + a learned ranker — **no LLM, no neural network** |
 | 3 | [`03_llm/`](03_llm/) | one OpenAI multimodal reasoning call per problem |
 
-Full write-up with per-set and per-problem breakdowns: **[COMPARISON.md](COMPARISON.md)**.
+| where to start | |
+|---|---|
+| **[Raven's Three Ways](https://claude.ai/code/artifact/af68d3b9-f040-47cc-a3cc-5a220595074b)** | the illustrated version: architecture diagrams, the dead ends, what it cost |
+| **[COMPARISON.md](COMPARISON.md)** | every number, per set and per problem |
+| **[docs/BUILD_LOG.md](docs/BUILD_LOG.md)** | the lab notebook — 16 experiments, 6 of them dropped |
+| **[01_original_2017/NOTES.md](01_original_2017/NOTES.md)** | what the 2017 code did, what worked, what was missing |
+| **[PROVENANCE.md](PROVENANCE.md)** | the brief, the models, the environment, every judgement call |
 
 <!-- HEADLINE:START -->
 ## Results
@@ -17,12 +23,13 @@ Full write-up with per-set and per-problem breakdowns: **[COMPARISON.md](COMPARI
 | Agent | Correct | Accuracy | Skipped | Wall clock | Needs network |
 |---|---|---|---|---|---|
 | Original (2017) | 34/96 | **35.4%** | 24 | 34 s | no |
-| Classical AI (no training) | 49/96 | **51.0%** | 0 | - | no |
+| Classical AI (no training) | 49/96 | **51.0%** | 0 | 54 s | no |
 | Classical AI + learned ranker | 59/96 | **61.5%** | 0 | 54 s | no |
 | LLM: gpt-5.6-sol | 93/96 | **96.9%** | 0 | 77 s | yes |
 | LLM: gpt-5.6-terra | 89/96 | **92.7%** | 0 | 193 s | yes |
+| LLM: gpt-5 | 84/96 | **87.5%** | 0 | 30 min | yes |
 
-Chance is 13.5% (24 problems with 6 options, 72 with 8). Wall clock for the two local agents is single-process on a laptop; for the LLMs it is the whole 96-problem sweep at 10 concurrent requests.
+Chance is 13.5% (24 problems with 6 options, 72 with 8). Wall clock for the local agents is single-process on a laptop; the two classical rows come from one `solver.py` run and share its time. For the LLMs it is the whole 96-problem sweep at 10 concurrent requests.
 <!-- HEADLINE:END -->
 
 ## The problems
@@ -61,7 +68,11 @@ common/ravens.py     one loader all three agents share, so they see identical in
 02_classical_ai/     imageops.py (CV primitives), features.py (rule engine), solver.py
 03_llm/solver.py     OpenAI runner
 scripts/compare.py   builds COMPARISON.md from results/ — no number is hand-typed
+scripts/make_page.py builds docs/index.html, the illustrated version, from the same data
+scripts/session_stats.py  what the build cost, read out of the Claude Code transcript
 results/             every run's raw CSV output
+docs/BUILD_LOG.md    the lab notebook: what was tried, what was dropped, what it cost
+PROVENANCE.md        the brief, the models used, the environment, the judgement calls
 ```
 
 ## Reading the results honestly

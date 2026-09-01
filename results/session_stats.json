@@ -1,0 +1,396 @@
+{
+  "code": {
+    "by_file": {
+      ".gitignore": [
+        "config",
+        9
+      ],
+      "01_original_2017/NOTES.md": [
+        "prose",
+        198
+      ],
+      "01_original_2017/typo_experiment.py": [
+        "python",
+        92
+      ],
+      "02_classical_ai/README.md": [
+        "prose",
+        109
+      ],
+      "02_classical_ai/diagnose.py": [
+        "python",
+        69
+      ],
+      "02_classical_ai/features.py": [
+        "python",
+        365
+      ],
+      "02_classical_ai/imageops.py": [
+        "python",
+        211
+      ],
+      "02_classical_ai/solver.py": [
+        "python",
+        269
+      ],
+      "03_llm/README.md": [
+        "prose",
+        54
+      ],
+      "03_llm/solver.py": [
+        "python",
+        220
+      ],
+      "COMPARISON.md": [
+        "generated output",
+        194
+      ],
+      "README.md": [
+        "prose",
+        97
+      ],
+      "common/ravens.py": [
+        "python",
+        119
+      ],
+      "requirements.txt": [
+        "prose",
+        8
+      ],
+      "results/README.md": [
+        "results data",
+        23
+      ],
+      "results/classical_answers.csv": [
+        "results data",
+        97
+      ],
+      "results/classical_ceiling.txt": [
+        "results data",
+        4
+      ],
+      "results/classical_summary.txt": [
+        "results data",
+        6
+      ],
+      "results/llm_gpt_5_6_sol_answers.csv": [
+        "results data",
+        97
+      ],
+      "results/llm_gpt_5_6_sol_summary.txt": [
+        "results data",
+        7
+      ],
+      "results/llm_gpt_5_6_terra_answers.csv": [
+        "results data",
+        97
+      ],
+      "results/llm_gpt_5_6_terra_summary.txt": [
+        "results data",
+        7
+      ],
+      "results/llm_runs.log": [
+        "results data",
+        330
+      ],
+      "results/original_answers.csv": [
+        "results data",
+        97
+      ],
+      "results/original_problem_results.csv": [
+        "results data",
+        97
+      ],
+      "results/original_runtime.txt": [
+        "results data",
+        1
+      ],
+      "results/original_set_results.csv": [
+        "results data",
+        9
+      ],
+      "results/original_stdout.log": [
+        "results data",
+        690
+      ],
+      "results/original_typo_experiment.txt": [
+        "results data",
+        5
+      ],
+      "run_llm_all.sh": [
+        "config",
+        8
+      ],
+      "run_original.py": [
+        "python",
+        37
+      ],
+      "scripts/compare.py": [
+        "python",
+        367
+      ],
+      "scripts/make_chart.py": [
+        "python",
+        90
+      ]
+    },
+    "by_kind": {
+      "config": 17,
+      "generated output": 194,
+      "prose": 466,
+      "python": 1839,
+      "results data": 1567
+    }
+  },
+  "session": {
+    "model_turns": 346,
+    "models": {
+      "claude-opus-5": 346
+    },
+    "span_seconds": 4891.132,
+    "tools": {
+      "Artifact": 1,
+      "AskUserQuestion": 1,
+      "Bash": 148,
+      "Monitor": 1,
+      "Read": 9,
+      "Skill": 3,
+      "ToolSearch": 2,
+      "mcp__claude-in-chrome__tabs_context_mcp": 1
+    },
+    "transcript": "55d7f79e-2372-4ef3-8283-fbfdcc34a1ca.jsonl",
+    "usage": {
+      "cache_creation_input_tokens": 1188318,
+      "cache_read_input_tokens": 69202964,
+      "input_tokens": 692,
+      "output_tokens": 572350
+    }
+  },
+  "timeline": [
+    [
+      "2026-09-01T13:03:58-04:00",
+      "2017 agent, all 96",
+      "acc_all=35.4%"
+    ],
+    [
+      "2026-09-01T13:08:12-04:00",
+      "non-LLM, rule vote only",
+      "TOTAL 55/96"
+    ],
+    [
+      "2026-09-01T13:09:05-04:00",
+      "non-LLM, learned (CV)",
+      "[learned] leave-one-SET-out (C=0.003) : 59/96"
+    ],
+    [
+      "2026-09-01T13:09:05-04:00",
+      "non-LLM, no training",
+      "[baseline] confidence-weighted rule voting, no training : 55/96"
+    ],
+    [
+      "2026-09-01T13:12:58-04:00",
+      "non-LLM, learned (CV)",
+      "[learned] leave-one-SET-out (C=0.1) : 57/96"
+    ],
+    [
+      "2026-09-01T13:12:58-04:00",
+      "non-LLM, no training",
+      "[baseline] confidence-weighted rule voting, no training : 56/96"
+    ],
+    [
+      "2026-09-01T13:16:06-04:00",
+      "non-LLM, rule vote only",
+      "TOTAL 53/96"
+    ],
+    [
+      "2026-09-01T13:17:39-04:00",
+      "non-LLM, rule vote only",
+      "TOTAL 47/96"
+    ],
+    [
+      "2026-09-01T13:22:09-04:00",
+      "non-LLM, learned (nested CV)",
+      "[B] rule search + learned ranker  : 59/96"
+    ],
+    [
+      "2026-09-01T13:22:09-04:00",
+      "non-LLM, no training",
+      "[A] rule search only, no training : 49/96"
+    ],
+    [
+      "2026-09-01T13:31:36-04:00",
+      "non-LLM, learned (nested CV)",
+      "[B] rule search + learned ranker  : 59/96"
+    ],
+    [
+      "2026-09-01T13:31:36-04:00",
+      "non-LLM, no training",
+      "[A] rule search only, no training : 49/96"
+    ],
+    [
+      "2026-09-01T13:48:53-04:00",
+      "non-LLM, learned (nested CV)",
+      "[B] rule search + learned ranker  : 59/96"
+    ],
+    [
+      "2026-09-01T13:48:53-04:00",
+      "non-LLM, no training",
+      "[A] rule search only, no training : 49/96"
+    ],
+    [
+      "2026-09-01T14:08:31-04:00",
+      "2017 agent, all 96",
+      "acc_all=35.4%"
+    ],
+    [
+      "2026-09-01T14:08:31-04:00",
+      "non-LLM, learned (CV)",
+      "[learned] leave-one-SET-out (C=0.003) : 59/96"
+    ],
+    [
+      "2026-09-01T14:08:31-04:00",
+      "non-LLM, learned (CV)",
+      "[learned] leave-one-SET-out (C=0.1) : 57/96"
+    ],
+    [
+      "2026-09-01T14:08:31-04:00",
+      "non-LLM, learned (nested CV)",
+      "[B] rule search + learned ranker  : 59/96"
+    ],
+    [
+      "2026-09-01T14:08:31-04:00",
+      "non-LLM, learned (nested CV)",
+      "[B] rule search + learned ranker  : 59/96"
+    ],
+    [
+      "2026-09-01T14:08:31-04:00",
+      "non-LLM, learned (nested CV)",
+      "[B] rule search + learned ranker  : 59/96"
+    ],
+    [
+      "2026-09-01T14:08:31-04:00",
+      "non-LLM, no training",
+      "[A] rule search only, no training : 49/96"
+    ],
+    [
+      "2026-09-01T14:08:31-04:00",
+      "non-LLM, no training",
+      "[A] rule search only, no training : 49/96"
+    ],
+    [
+      "2026-09-01T14:08:31-04:00",
+      "non-LLM, no training",
+      "[A] rule search only, no training : 49/96"
+    ],
+    [
+      "2026-09-01T14:08:31-04:00",
+      "non-LLM, rule vote only",
+      "TOTAL 47/96"
+    ],
+    [
+      "2026-09-01T14:08:31-04:00",
+      "non-LLM, rule vote only",
+      "TOTAL 53/96"
+    ],
+    [
+      "2026-09-01T14:08:31-04:00",
+      "non-LLM, rule vote only",
+      "TOTAL 55/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "2017 agent, all 96",
+      "acc_all=35.4%"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "2017 agent, all 96",
+      "acc_all=35.4%"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, learned (CV)",
+      "[learned] leave-one-SET-out (C=0.003) : 59/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, learned (CV)",
+      "[learned] leave-one-SET-out (C=0.003) : 59/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, learned (CV)",
+      "[learned] leave-one-SET-out (C=0.1) : 57/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, learned (CV)",
+      "[learned] leave-one-SET-out (C=0.1) : 57/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, learned (nested CV)",
+      "[B] rule search + learned ranker  : 59/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, learned (nested CV)",
+      "[B] rule search + learned ranker  : 59/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, learned (nested CV)",
+      "[B] rule search + learned ranker  : 59/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, learned (nested CV)",
+      "[B] rule search + learned ranker  : 59/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, learned (nested CV)",
+      "[B] rule search + learned ranker  : 59/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, no training",
+      "[A] rule search only, no training : 49/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, no training",
+      "[A] rule search only, no training : 49/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, no training",
+      "[A] rule search only, no training : 49/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, no training",
+      "[baseline] confidence-weighted rule voting, no training : 55/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, no training",
+      "[baseline] confidence-weighted rule voting, no training : 56/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, rule vote only",
+      "TOTAL 47/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, rule vote only",
+      "TOTAL 53/96"
+    ],
+    [
+      "2026-09-01T14:09:08-04:00",
+      "non-LLM, rule vote only",
+      "TOTAL 55/96"
+    ]
+  ]
+}

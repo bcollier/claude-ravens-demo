@@ -1,0 +1,7 @@
+model            : gpt-5
+effort           : high
+problems         : 96
+correct          : 84
+accuracy         : 0.8750
+wall_seconds     : 1773.00
+workers          : 10
