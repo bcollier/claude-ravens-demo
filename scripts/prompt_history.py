@@ -23,6 +23,12 @@ NOISE = ("<system-reminder>", "<task-notification>", "<local-command",
          "[SYSTEM NOTIFICATION", "Caveat: The messages below")
 
 
+def is_only_attachments(text):
+    """Pasted screenshots arrive as their own bare '[Image: source: ...]' lines."""
+    lines = [ln for ln in text.split("\n") if ln.strip()]
+    return bool(lines) and all(ln.strip().startswith("[Image:") for ln in lines)
+
+
 def find_transcript():
     hits = glob.glob(os.path.expanduser("~/.claude/projects/*/*.jsonl"))
     return max(hits, key=os.path.getmtime) if hits else None
@@ -46,7 +52,7 @@ def user_messages(path):
         # as queue-operation records rather than as user messages.
         if rec.get("type") == "queue-operation" and rec.get("operation") == "enqueue":
             text = str(rec.get("content") or "").strip()
-            if text and not any(n in text for n in NOISE):
+            if text and not any(n in text for n in NOISE) and not is_only_attachments(text):
                 when = rec.get("timestamp")
                 stamp = (datetime.datetime.fromisoformat(when.replace("Z", "+00:00"))
                          .astimezone(TZ).strftime("%H:%M") if when else "")
@@ -72,6 +78,8 @@ def user_messages(path):
         if not text or any(n in text for n in NOISE):
             continue
         if any(m in text for m in SKILL_MARKERS) or text.startswith("<command-name>"):
+            continue
+        if is_only_attachments(text):
             continue
         when = rec.get("timestamp")
         stamp = (datetime.datetime.fromisoformat(when.replace("Z", "+00:00"))
@@ -108,6 +116,8 @@ def main():
          "---\n"]
 
     for i, (stamp, text) in enumerate(msgs, 1):
+        text = "\n".join(ln for ln in text.split("\n")
+                          if not ln.strip().startswith("[Image: source:")).strip()
         L.append(f"## {i}. {stamp}\n")
         L.append("\n".join("> " + ln if ln.strip() else ">"
                            for ln in text.split("\n")))

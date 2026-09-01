@@ -75,7 +75,7 @@
       ],
       "EPILOGUE.md": [
         "prose",
-        252
+        270
       ],
       "PROMPT_HISTORY.md": [
         "prose",
@@ -87,7 +87,7 @@
       ],
       "README.md": [
         "prose",
-        383
+        462
       ],
       "check_openrouter_key.sh": [
         "config",
@@ -127,17 +127,25 @@
       ],
       "results/epilogue_batch_estimate.md": [
         "results data",
-        13
+        21
       ],
       "results/epilogue_error_analysis.txt": [
         "results data",
-        33
+        38
       ],
       "results/epilogue_llm_anthropic_claude_fable_5_answers.csv": [
         "results data",
         97
       ],
       "results/epilogue_llm_anthropic_claude_fable_5_summary.txt": [
+        "results data",
+        12
+      ],
+      "results/epilogue_llm_deepseek_deepseek_v4_flash_vision_exp_answers.csv": [
+        "results data",
+        97
+      ],
+      "results/epilogue_llm_deepseek_deepseek_v4_flash_vision_exp_summary.txt": [
         "results data",
         12
       ],
@@ -181,6 +189,22 @@
         "results data",
         12
       ],
+      "results/epilogue_llm_meta_llama_llama_4_maverick_answers.csv": [
+        "results data",
+        97
+      ],
+      "results/epilogue_llm_meta_llama_llama_4_maverick_summary.txt": [
+        "results data",
+        12
+      ],
+      "results/epilogue_llm_moonshotai_kimi_k3_answers.csv": [
+        "results data",
+        97
+      ],
+      "results/epilogue_llm_moonshotai_kimi_k3_summary.txt": [
+        "results data",
+        12
+      ],
       "results/epilogue_llm_o3_answers.csv": [
         "results data",
         97
@@ -189,11 +213,27 @@
         "results data",
         12
       ],
+      "results/epilogue_llm_qwen_qwen3_8_max_answers.csv": [
+        "results data",
+        97
+      ],
+      "results/epilogue_llm_qwen_qwen3_8_max_summary.txt": [
+        "results data",
+        12
+      ],
       "results/epilogue_llm_x_ai_grok_4_6_answers.csv": [
         "results data",
         97
       ],
       "results/epilogue_llm_x_ai_grok_4_6_summary.txt": [
+        "results data",
+        12
+      ],
+      "results/epilogue_llm_z_ai_glm_5v_turbo_answers.csv": [
+        "results data",
+        97
+      ],
+      "results/epilogue_llm_z_ai_glm_5v_turbo_summary.txt": [
         "results data",
         12
       ],
@@ -331,7 +371,7 @@
       ],
       "results/session_stats.json": [
         "results data",
-        449
+        685
       ],
       "results/session_timeline.txt": [
         "results data",
@@ -363,7 +403,7 @@
       ],
       "scripts/make_chart.py": [
         "python",
-        90
+        176
       ],
       "scripts/make_epilogue.py": [
         "python",
@@ -379,11 +419,11 @@
       ],
       "scripts/make_payload_figure.py": [
         "python",
-        224
+        285
       ],
       "scripts/make_readme.py": [
         "python",
-        613
+        780
       ],
       "scripts/predictions.py": [
         "python",
@@ -405,43 +445,44 @@
     "by_kind": {
       "config": 44,
       "generated output": 502,
-      "prose": 1461,
-      "python": 6383,
-      "results data": 5657
+      "prose": 1558,
+      "python": 6697,
+      "results data": 6451
     }
   },
   "epilogue": {
     "found": true,
     "from": "2026-09-01T18:24:43.817Z",
-    "model_turns": 364,
-    "span_seconds": 9118.88,
-    "to": "2026-09-01T20:56:42.697Z",
+    "model_turns": 419,
+    "span_seconds": 12837.162,
+    "to": "2026-09-01T21:58:40.979Z",
     "tools": {
-      "Bash": 144,
+      "Artifact": 1,
+      "Bash": 166,
       "Monitor": 7,
-      "Read": 9,
+      "Read": 14,
       "TaskStop": 2,
       "ToolSearch": 1
     },
     "usage": {
-      "cache_creation_input_tokens": 559481,
-      "cache_read_input_tokens": 180883309,
-      "input_tokens": 728,
-      "output_tokens": 487221
+      "cache_creation_input_tokens": 676805,
+      "cache_read_input_tokens": 216751308,
+      "input_tokens": 838,
+      "output_tokens": 554580
     }
   },
   "session": {
-    "model_turns": 716,
+    "model_turns": 771,
     "models": {
-      "claude-opus-5": 716
+      "claude-opus-5": 771
     },
-    "span_seconds": 14284.338,
+    "span_seconds": 18002.62,
     "tools": {
-      "Artifact": 2,
+      "Artifact": 3,
       "AskUserQuestion": 1,
-      "Bash": 294,
+      "Bash": 316,
       "Monitor": 8,
-      "Read": 18,
+      "Read": 23,
       "Skill": 3,
       "TaskStop": 2,
       "ToolSearch": 3,
@@ -449,10 +490,10 @@
     },
     "transcript": "55d7f79e-2372-4ef3-8283-fbfdcc34a1ca.jsonl",
     "usage": {
-      "cache_creation_input_tokens": 1756938,
-      "cache_read_input_tokens": 252229763,
-      "input_tokens": 1432,
-      "output_tokens": 1064588
+      "cache_creation_input_tokens": 1874262,
+      "cache_read_input_tokens": 288097762,
+      "input_tokens": 1542,
+      "output_tokens": 1131947
     }
   },
   "timeline": [

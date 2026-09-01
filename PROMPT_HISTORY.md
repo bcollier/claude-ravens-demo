@@ -4,7 +4,7 @@ The complete set of prompts behind this project, quoted exactly as typed. Extrac
 
 It is worth reading as its own artefact. Almost none of these prompts specify *how* to do anything. They state a goal, and several of the most consequential ones are corrections or challenges to work already done — asking for a neural network that had been left out, asking whether the evaluation was honest, asking what had actually been achieved by a particular minute. The quality of the result owes more to those than to the opening brief.
 
-All times are local, on the day of the session. 16 messages.
+All times are local, on the day of the session. 18 messages.
 
 ---
 
@@ -97,3 +97,11 @@ All times are local, on the day of the session. 16 messages.
 ## 16. 15:47
 
 > finally, put a .md file with all of the prompts I have given you for this whole project so far in the repository and push it. call it PROMPT_HISTORY.md or something similar, link to it in the readme
+
+## 17. 17:50
+
+> add total cost of the experiment, be more specific about what kind of approach it used here- Modern program, no language model, [Image #2] this image should be broken down, I want to know exactly how many files it sent, like 1 whole image then all cells and options? it's not clear to me. movethe "SAME PAYLOAD DIFFERENT BILL" out of the description of what was sent so it is clear what was sent [Image #3]. for contestant 2 be more specific aboat the approach, see the PDF in the ravensdemo directory about AI techniques. was this expert? knowledge based? tie it to course concepts a bit more so it is clear. what was the original "student" approach? in the comparison table highlight the most accurate, highest cost, and longest time. make a small graph comparing all the OpenAI sorted by their release date. put their release date along on the graph to show. for the whole table do your best to add the release date of each model as a new column. is it possible to show how many tokens claude code spent on the in-class experiment as well as the epilogue? show that as a section. add a section with some explanation of how the LLM is doing what it is doing, at an undergrad reading level. give links to more details such as a vision transformer, embeddings, etc. include this prompt in the prompt history file.
+
+## 18. 17:52
+
+> rather than a commit make this a pull request, then push the PR. I want to show a pull request to students

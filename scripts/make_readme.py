@@ -17,7 +17,8 @@ ROOT = os.path.dirname(HERE)
 sys.path[:0] = [HERE, os.path.join(ROOT, "common")]
 
 import ravens    # noqa: E402
-import pricing   # noqa: E402
+import pricing      # noqa: E402
+import model_dates  # noqa: E402
 
 RESULTS = os.path.join(ROOT, "results")
 PROBLEMS = ravens.load_all()
@@ -49,6 +50,7 @@ def llm_runs():
         cost = charged if charged > 0 else (pricing.estimate(model, in_t, out_t, table)[0] or 0)
         out.append({
             "model": model, "correct": sum(int(r["Correct"]) for r in rows),
+            "released": model_dates.date_for(model) or "",
             "cost": cost, "wall": float(s.get("wall_seconds", 0) or 0),
             "in_t": in_t, "out_t": out_t,
             "answers": {r["RavensProblem"]: int(r["Answer"]) for r in rows},
@@ -95,6 +97,11 @@ def main():
 
     L = []
     w = L.append
+    _n = [0]
+
+    def sec(title):
+        _n[0] += 1
+        w(f"---\n\n## {_n[0]}. {title}\n")
 
     # ------------------------------------------------------------- opening
     w("# Can a computer pass an IQ test?\n")
@@ -108,8 +115,10 @@ def main():
       "quoted exactly as typed.\n")
     w(f"| | Score out of {N} | |")
     w("|---|---|---|")
-    w(f"| The 2017 student project | **{n_orig}** | 35% |")
-    w(f"| A modern program with no AI language model | **{n_clas}** | 62% |")
+    w(f"| The 2017 student project, a hand-tuned scoring function | **{n_orig}** "
+      f"| {n_orig/N:.0%} |")
+    w(f"| A rule-based expert system with a learned ranker, no AI language model "
+      f"| **{n_clas}** | {n_clas/N:.0%} |")
     w(f"| An AI language model (`{best['model']}`) | **{best['correct']}** | "
       f"{best['correct']/N:.0%} |")
     w(f"| Guessing at random | 13 | 13% |")
@@ -118,7 +127,7 @@ def main():
       "they are, and — more usefully — where the AI still fails and why.\n")
 
     # ------------------------------------------------------------- the test
-    w("---\n\n## 1. The test\n")
+    sec("The test")
     w("**Raven's Progressive Matrices** is a reasoning test designed in 1936. It uses "
       "no words and no numbers, which is the point: it was built to measure reasoning "
       "without measuring education or language. You are shown a grid of pictures with "
@@ -148,12 +157,16 @@ def main():
       "models, and section 6 comes back to it.\n")
 
     # ------------------------------------------------------- contestant 1
-    w("---\n\n## 2. Contestant one: the 2017 student project\n")
+    sec("Contestant one: the 2017 student project")
     w("The starting point was a real university assignment from eight years ago, "
       "written for a Georgia Tech course on knowledge-based AI. **It was run "
       "completely unmodified** — not a single character changed — and it still works "
       f"on today's software. It answered all {N} problems in {orig_rt:.0f} seconds.\n")
     w("### What it does\n")
+    w("In the vocabulary of the course deck *Rules, Search and Expert Systems*, this "
+      "is a **heuristic evaluation function**, not an expert system. There is no "
+      "knowledge base of rules and no inference engine that searches through them. "
+      "There is one fixed formula, applied identically to every puzzle.\n")
     w("Its strategy is to turn each picture into a handful of numbers, then do "
       "arithmetic on them. The main number is simply **what percentage of the square "
       "is covered in black ink**. If ink coverage goes 10%, 20%, 30% along a row, the "
@@ -186,11 +199,37 @@ def main():
       "into the tuning. (`01_original_2017/typo_experiment.py` runs this.)\n")
 
     # ------------------------------------------------------- contestant 2
-    w("---\n\n## 3. Contestant two: a modern program, no AI language model allowed\n")
+    sec("Contestant two: a modern program, no AI language model allowed")
     w("The rule for this one was: solve the puzzles using any technique you like, "
       "except the sort of AI that has read the internet. So this program has to be "
       "*told* how to reason, in code.\n")
-    w("### The approach, and why\n")
+    w("### The approach, in course terms\n")
+    w("This one *is* an **expert system**, in the classical sense from the *Rules, "
+      "Search and Expert Systems* material, with one modern addition:\n")
+    w("| Course concept | Where it appears here |")
+    w("|---|---|")
+    w("| **Knowledge representation** | A picture is not stored as pixels but "
+      "decomposed into **frames** — slots and values: outer frame, inner shape, "
+      "interior detail, object count, fill. `imageops.py` builds five such views of "
+      "every panel. This is the same idea as the *semantic network* representation "
+      "that ships with the original dataset. |")
+    w("| **Knowledge base** | About 300 candidate **if–then production rules** per "
+      "puzzle: *if the third cell is the pixel union of the first two across every "
+      "visible row, then the answer is the union of the last two.* |")
+    w("| **Search** | The rules define a **state space**, and the program searches it "
+      "rather than applying one formula. This is generate-and-test: propose, then "
+      "check. |")
+    w("| **Inference engine** | **Forward chaining** from what is visible to a "
+      "conclusion: take the givens, apply each rule, see what it predicts. |")
+    w("| **Heuristics** | Each rule carries a confidence, and the confidences decide "
+      "which conclusion wins. |")
+    w("")
+    w("The addition is where it stops being a textbook expert system. In a classical "
+      "one, a human expert supplies both the rules **and** how much to trust each "
+      "one. Here the rules are still hand-written, but **the trust is measured from "
+      "data** — which is the hinge this whole project turns on, and the next two "
+      "sections are about it.\n")
+    w("### Why this approach\n")
     w("The 2017 program's limit was that it measured seven things and hoped one of "
       "them mattered. The obvious fix is to **propose a large number of possible "
       "rules and then work out which one is actually in force**. So this program "
@@ -267,7 +306,7 @@ def main():
       "this: every training metric healthy, the deployed model quietly useless.\n")
 
     # ------------------------------------------------------- contestant 3
-    w("---\n\n## 4. Contestant three: the AI language model\n")
+    sec("Contestant three: the AI language model")
     w("This is the technology behind ChatGPT and its competitors. It has been trained "
       "on an enormous amount of text and images. Nobody programmed it to solve Raven's "
       "matrices; the question is whether it can anyway.\n")
@@ -284,6 +323,13 @@ def main():
       "cells form a row, which one is missing — but any single cell inside it is too "
       "small to compare shapes reliably. The individual pictures give the detail but "
       "lose all sense of position. Neither on its own is enough.\n")
+    w("### The same files cost wildly different amounts\n")
+    w("![Input tokens per problem, by model](docs/llm_tokens.png)\n")
+    w("Every model received exactly those 17 files. A **token** is the unit these "
+      "companies bill in — roughly a chunk of text, or a patch of an image — and each "
+      "company chops pictures up differently. The same puzzle costs `gpt-5.6-sol` "
+      "about 2,500 tokens and `gemini-3.1-pro` about 17,000. **Compare vendors on "
+      "money, never on tokens.**\n")
     w("The model is also given a short instruction listing the kinds of rule these "
       "puzzles use — 134 words, quoted in full in "
       "[03_llm/README.md](03_llm/README.md). That is the only help it gets. **No "
@@ -303,24 +349,43 @@ def main():
       "which is what makes section 6 possible.\n")
 
     # ------------------------------------------------------- results
-    w("---\n\n## 5. The results\n")
+    sec("The results")
     labs = {(r["model"].split("/")[0] if "/" in r["model"] else "openai") for r in runs}
     w(f"{len(runs)} different language models from {len(labs)} companies were run on "
       f"the identical {N} puzzles with the identical prompt. Alongside them, the two "
       f"programs that run on a laptop with no internet.\n")
-    w("| | Score | Accuracy | Cost | Time | Needs internet |")
-    w("|---|---|---|---|---|---|")
-    w(f"| **2017 student project** | {n_orig}/{N} | {n_orig/N:.0%} | $0 | "
+    best_acc = max(r["correct"] for r in runs)
+    worst_cost = max(r["cost"] for r in runs)
+    slowest = max(r["wall"] for r in runs)
+    w("| | Released | Score | Accuracy | Cost | Time | Needs internet |")
+    w("|---|---|---|---|---|---|---|")
+    w(f"| **2017 student project** | 2017 | {n_orig}/{N} | {n_orig/N:.0%} | $0 | "
       f"{orig_rt:.0f} s | no |")
-    w(f"| **Modern program, no language model** | {n_clas}/{N} | {n_clas/N:.0%} | $0 | "
-      f"{float(csum.get('runtime_seconds',0)):.0f} s | no |")
+    w(f"| **Rule-based expert system + learned ranker** | 2026 | {n_clas}/{N} | "
+      f"{n_clas/N:.0%} | $0 | {float(csum.get('runtime_seconds',0)):.0f} s | no |")
     for r in runs:
+        tags = []
+        if r["correct"] == best_acc:
+            tags.append("🏆 most accurate")
+        if r["cost"] == worst_cost:
+            tags.append("💸 most expensive")
+        if r["wall"] == slowest:
+            tags.append("🐌 slowest")
+        note = ("<br>" + " · ".join(f"**{t}**" for t in tags)) if tags else ""
         star = " *(used in class)*" if r["inclass"] else ""
-        w(f"| `{r['model']}`{star} | {r['correct']}/{N} | {r['correct']/N:.0%} | "
-          f"${r['cost']:.2f} | {r['wall']:.0f} s | yes |")
+        w(f"| `{r['model']}`{star}{note} | {r['released'] or '—'} | {r['correct']}/{N} | "
+          f"{r['correct']/N:.0%} | ${r['cost']:.2f} | {r['wall']:.0f} s | yes |")
     w("")
     w("Costs are for all 96 puzzles. Times are for the whole sweep with ten requests "
-      "running at once.\n")
+      "running at once. Release dates are the date each model was first publicly "
+      "listed.\n")
+    w("### The same company, over two and a half years\n")
+    w("![OpenAI models on the same 96 problems, by release date](docs/openai_timeline.png)\n")
+    w("Two models released **two days apart** sit on opposite sides of the line. "
+      "`gpt-4.1` scored 36 and `o3` scored 76 — because `o3` was the first of these "
+      "designed to spend time working through a problem step by step before "
+      "answering, rather than responding immediately. That single design change "
+      "matters more here than the two years of scaling around it.\n")
     w("### What stands out\n")
     top = [r for r in runs if r["correct"] >= max(x["correct"] for x in runs) - 1]
     tie = {}
@@ -379,7 +444,7 @@ def main():
     ps = os.path.join(RESULTS, "predictions_summary.json")
     if os.path.exists(ps):
         pred = json.load(open(ps))
-        w("---\n\n## 6. The class sweepstake\n")
+        sec("The class sweepstake")
         w(f"Before any code was written, {pred['n_students']} students were asked to "
           "predict two things. Here is how they did.\n")
         w("### \"Will it solve even one puzzle without an LLM by the end of class?\"\n")
@@ -419,8 +484,56 @@ def main():
           f"the class beat almost every individual in it. That is a real and repeatable "
           f"effect, and it is why prediction markets work.\n")
 
+    # ------------------------------------------------------- what it cost
+    total_api = sum(r["cost"] for r in runs)
+    stats = json.load(open(os.path.join(RESULTS, "session_stats.json")))
+    sess, epi = stats.get("session", {}), stats.get("epilogue", {})
+    su, eu = sess.get("usage", {}), epi.get("usage", {})
+    inclass = {k: su.get(k, 0) - eu.get(k, 0) for k in su}
+
+    sec("What the whole experiment cost")
+    w(f"**Total spend on AI models: ${total_api:.2f}.** That is every one of the "
+      f"{len(runs)} models answering all {N} puzzles, {len(runs) * N:,} questions in "
+      f"total. The two programs that run on a laptop cost nothing but about 90 "
+      f"seconds of electricity between them.\n")
+    w("| | Cost |")
+    w("|---|---|")
+    w(f"| The three models used live in class | "
+      f"${sum(r['cost'] for r in runs if r['inclass']):.2f} |")
+    w(f"| The {sum(1 for r in runs if not r['inclass'])} models added afterwards | "
+      f"${sum(r['cost'] for r in runs if not r['inclass']):.2f} |")
+    w(f"| Both programs that need no internet | $0.00 |")
+    w(f"| **Everything** | **${total_api:.2f}** |")
+    w("")
+    w("Running the same sweep in batch mode would have cost roughly half — see "
+      "[EPILOGUE.md](EPILOGUE.md).\n")
+    w("### And what the AI that wrote the code used\n")
+    w("All of this — the two programs, the neural network, the evaluation harness, "
+      "every figure and every document — was written by Claude Opus 5 driving a "
+      "terminal. That work has its own token bill, measured from the session "
+      "transcript:\n")
+    w("| | In class | Added afterwards | Total |")
+    w("|---|---|---|---|")
+    rows_t = [("Output tokens (code written, plus private reasoning)", "output_tokens"),
+              ("Fresh input tokens", "input_tokens"),
+              ("Cache writes", "cache_creation_input_tokens"),
+              ("Cache reads", "cache_read_input_tokens")]
+    for label, key in rows_t:
+        w(f"| {label} | {inclass.get(key,0):,} | {eu.get(key,0):,} | "
+          f"{su.get(key,0):,} |")
+    w(f"| Assistant turns | {sess.get('model_turns',0) - epi.get('model_turns',0):,} | "
+      f"{epi.get('model_turns',0):,} | {sess.get('model_turns',0):,} |")
+    w("")
+    w("Two things stand out. **Cache reads dwarf everything else** — nearly every "
+      "token the model read was a re-read of the same growing conversation, which is "
+      "what makes a session this long affordable at all. And **output tokens dwarf "
+      "the visible chat by around fifty times**: almost everything produced was source "
+      "code and private reasoning, not words on a screen.\n")
+    w("Figures are a snapshot taken while the session was still running; re-run "
+      "`python scripts/session_stats.py` for current ones.\n")
+
     # ------------------------------------------------------- mistakes
-    w("---\n\n## 7. Where the AI still fails\n")
+    sec("Where the AI still fails")
     w("This is the most useful section, because the failures are not random.\n")
     w(f"Taking the {len(strong)} models that scored 70% or better:\n")
     w(f"- **{clean} of the {N} puzzles** were solved by every single one of them.")
@@ -484,8 +597,62 @@ def main():
       "threshold you could set to catch its mistakes automatically. If you are "
       "deploying one of these, do not expect it to flag its own errors.\n")
 
+    # ------------------------------------------------------- how it works
+    sec("How is the language model doing this at all?")
+    w("Nobody wrote a Raven's solver inside it. It is worth understanding roughly "
+      "what it *is* doing, because the mistakes in the previous section follow "
+      "directly from the mechanism.\n")
+    w("**Everything becomes numbers.** The pictures are cut into small square patches "
+      "— think of a grid laid over each image — and every patch is turned into a list "
+      "of a few thousand numbers called an "
+      "[embedding](https://en.wikipedia.org/wiki/Word_embedding). An embedding is a "
+      "position in a very high-dimensional space where similar things land near each "
+      "other: two pictures of an octagon end up close together, an octagon and a "
+      "circle a little further apart, an octagon and the word \"octagon\" also close "
+      "by, because the model was trained on pictures and text together. The words in "
+      "the prompt are turned into embeddings the same way. After this step there is "
+      "no difference between an image and a sentence — both are just long lists of "
+      "numbers in the same space.\n")
+    w("**The model looks for relationships between them.** The architecture is a "
+      "[transformer](https://jalammar.github.io/illustrated-transformer/), and for "
+      "images specifically a "
+      "[vision transformer](https://en.wikipedia.org/wiki/Vision_transformer). Its "
+      "central operation, "
+      "[attention](https://en.wikipedia.org/wiki/Attention_(machine_learning)), lets "
+      "every patch of every image look at every other patch and at every word, and "
+      "decide which ones are relevant to it. That is why sending the panels "
+      "separately and labelled helps: it lets the model attend to \"Cell A\" as a "
+      "unit and compare it against \"Option 3\" directly.\n")
+    w("**It predicts the next chunk of text, over and over.** That is the only thing "
+      "it was ever trained to do — on an enormous amount of text and images, guess "
+      "what comes next. Everything else, including the reasoning, is a side effect of "
+      "getting extremely good at that. When it writes *\"the outer shapes cycle "
+      "through three states in each row\"*, it is not consulting a stored rule about "
+      "Raven's matrices; it is producing the words that best continue the prompt, and "
+      "for a model of this size those words tend to be true ones.\n")
+    w("**The newer ones think before answering.** The jump in the chart above between "
+      "`gpt-4.1` and `o3` is [chain-of-thought "
+      "reasoning](https://arxiv.org/abs/2201.11903): the model writes out a long "
+      "private working-out, which you are not shown and which you pay for as output "
+      "tokens, before committing to an answer. `gpt-5` spent about 475,000 such "
+      "hidden tokens across these 96 puzzles. It is, quite literally, the difference "
+      "between answering off the top of your head and working it through on paper.\n")
+    w("**Which explains the failures.** Section 7's two errors are exactly what this "
+      "mechanism predicts. Attention is drawn to what is salient, so a dramatic "
+      "visual change (bands filling in black) crowds out a quiet one (rings being "
+      "removed). And there is no scratchpad with guaranteed arithmetic — tracking "
+      "three constraints at once through a sudoku is done in the same "
+      "next-word machinery as everything else, and it slips. **The model is doing "
+      "sophisticated pattern completion, not symbolic verification.** For the "
+      "verification step, ordinary software is still better.\n")
+    w("If you want to go deeper: the [original transformer "
+      "paper](https://arxiv.org/abs/1706.03762) (2017) and the [vision transformer "
+      "paper](https://arxiv.org/abs/2010.11929) (2020) are the two that got us here, "
+      "and OpenAI's [tokenizer](https://platform.openai.com/tokenizer) lets you see "
+      "text being chopped into billable units.\n")
+
     # ------------------------------------------------------- takeaways
-    w("---\n\n## 8. What to take from this\n")
+    sec("What to take from this")
     w("**Old software is more durable than you think.** Eight-year-old code ran "
       "untouched. The expensive part of software is rarely keeping it alive; it is "
       "that its original design decides its ceiling.\n")
@@ -513,7 +680,7 @@ def main():
       "always yours.\n")
 
     # ------------------------------------------------------- technical
-    w("---\n\n## 9. Technical notes\n")
+    sec("Technical notes")
     w("*For readers who want to run or extend this. Everything below is optional.*\n")
     w("### Getting started\n")
     w("```bash\n"
