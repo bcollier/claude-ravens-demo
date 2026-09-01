@@ -30,3 +30,5 @@
   google/gemini-3.7-flash                      92/96 = 95.8%  $ 1.499    144s  0 unparseable
 === x-ai/grok-4.6 ===
     x-ai/grok-4.6: 12/96 done, 12 correct
+    x-ai/grok-4.6: 24/96 done, 23 correct
+    x-ai/grok-4.6: 36/96 done, 35 correct

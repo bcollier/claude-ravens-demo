@@ -349,6 +349,81 @@ def main():
       "directly: the model that made ChatGPT famous in 2022 cannot even be entered into "
       "this comparison, and the barrier is modality, not reasoning.\n")
 
+    # ---------------------------------------------------------- error analysis
+    ea = os.path.join(RESULTS, "epilogue_error_analysis.txt")
+    if os.path.exists(ea) and epi_runs:
+        strong = [r for r in (epi_runs + inclass) if r["correct"] / N >= 0.70]
+        names = sorted({n for n in TRUTH})
+        wrong_by = {n: [r for r in strong if r["answers"].get(n) != TRUTH[n]]
+                    for n in names}
+        shared = [n for n in names if len(wrong_by[n]) >= 2]
+        clean = [n for n in names if not wrong_by[n]]
+        total_err = sum(len(v) for v in wrong_by.values())
+        shared_err = sum(len(wrong_by[n]) for n in shared)
+
+        w("---\n\n## Part 4 — Do the models fail on the same problems?\n")
+        w(f"Yes, decisively. Taking the {len(strong)} models that score 70% or better:\n")
+        w(f"- **{len(clean)} of {N} problems** were solved by every one of them.")
+        w(f"- The **{len(shared)} problems missed by two or more** account for "
+          f"**{shared_err/max(total_err,1):.0%} of all errors**.")
+        w(f"- Error sets overlap about **4x more than independent errors would** "
+          f"(Jaccard 0.16 observed against 0.04 for random failures of the same size).")
+        w(f"- And when several models miss the same problem, **63% of them choose the "
+          f"same wrong option** — against roughly 14% for guessing.\n")
+        w("Independent labs, different architectures, different training data, "
+          "converging on the same wrong answer. That is a property of the problems, "
+          "not of any one model.\n")
+
+        w("### The problems that beat them\n")
+        w("| Problem | Correct | Missed by | Answers given | Agreement |")
+        w("|---|---|---|---|---|")
+        import collections as _c
+        rows_ea = sorted(shared, key=lambda n: -len(wrong_by[n]))
+        for n in rows_ea[:8]:
+            picks = _c.Counter(r["answers"].get(n) for r in wrong_by[n])
+            modal, cnt = picks.most_common(1)[0]
+            dist = ", ".join(f"{k} ({v})" for k, v in picks.most_common())
+            w(f"| `{n.replace('Problem ','')}` | {TRUTH[n]} | {len(wrong_by[n])}/"
+              f"{len(strong)} | {dist} | {cnt/len(wrong_by[n]):.0%} on option {modal} |")
+        w("")
+
+        w("### Why: two rules, and they only apply one\n")
+        w("`Challenge B-03` and `B-04` are the same puzzle in squares and circles. "
+          "Cell A is five nested outlines; cell B is the same five with alternate bands "
+          "filled black; cell C is three nested outlines. Two rules operate at once: "
+          "**left-to-right fills alternate bands**, and **top-to-bottom removes two "
+          "rings** (5 → 3 → 1).\n")
+        w("The correct answer to B-03 needs both: one ring, filled — a plain black "
+          "square. Five of seven strong models answered option 1, which is what you get "
+          "by applying the fill rule to three rings and never checking the column. Their "
+          "stated rules give them away:\n")
+        w("> *\"The right column shows the left column\u2019s concentric squares with "
+          "alternate rings filled black\"* — a correct description of half the puzzle.\n")
+        w("The two that solved it stated both rules:\n")
+        w("> *\"The number of nested squares decreases by 2 both across rows and down "
+          "columns (5\u21923\u21921), and moving left\u2192right changes thin outlines "
+          "to solid black.\"*\n")
+        w("The system prompt explicitly says to check rows **and** columns before "
+          "committing. Being told is not enough: the fill transformation is visually "
+          "loud and the count progression is quiet, and the loud one wins.\n")
+
+        w("### Why: the rule is right and the arithmetic is wrong\n")
+        w("`Challenge D-08` is a Latin square over three attributes at once — one, two "
+          "or three triangles; filled or outline; upright or right-pointing. Four of "
+          "seven missed it, and this time they *state the rule correctly*:\n")
+        w("> *\"Each row and column contains one cell with 1, 2, and 3 triangles, while "
+          "the styles cycle among filled upright, outlined upright, and outlined "
+          "right-pointing\"* — then picks the wrong cell.\n")
+        w("That is not a reasoning failure, it is a bookkeeping failure: three "
+          "constraints have to be intersected simultaneously and the models lose track. "
+          "It is exactly the operation the classical agent does perfectly and for free, "
+          "because it is a loop over permutations rather than something held in mind.\n")
+        w("Which is the useful shape of the result. The LLMs are far better at "
+          "*noticing* what kind of rule is present; they are worse at the exhaustive "
+          "checking once they have. Set B\u2019s 2x2 problems, where there is only one "
+          "row to learn the rule from and no second line to confirm it against, are "
+          "where they lose most ground.\n")
+
     # ---------------------------------------------------------- batch mode
     bpath = os.path.join(RESULTS, "epilogue_batch_estimate.md")
     if os.path.exists(bpath):

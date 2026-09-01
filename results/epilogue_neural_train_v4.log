@@ -28,3 +28,20 @@ training the relation network on synthetic matrices (8000 steps x batch 32) ...
   step  6500  loss 1.260  synthetic-val 55.1%  (659s)
   step  6750  loss 1.126  synthetic-val 57.0%  (684s)
   step  7000  loss 1.085  synthetic-val 57.8%  (710s)
+  step  7250  loss 0.781  synthetic-val 56.2%  (738s)
+  step  7500  loss 0.755  synthetic-val 57.4%  (763s)
+  step  7750  loss 0.681  synthetic-val 56.2%  (789s)
+  step  8000  loss 1.151  synthetic-val 55.9%  (814s)
+
+D1 relation network on the real 96: 10/96 = 10.4%
+  Basic Problems B            2/12
+  Basic Problems C            2/12
+  Basic Problems D            1/12
+  Basic Problems E            0/12
+  Challenge Problems B        3/12
+  Challenge Problems C        0/12
+  Challenge Problems D        1/12
+  Challenge Problems E        1/12
+
+synthetic validation accuracy at the end of training: 55.9%
+total 816s

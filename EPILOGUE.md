@@ -28,7 +28,8 @@ Three versions of the *same network and the same training budget*. Only the gene
 |---|---|---|---|
 | v1 | every attribute given its own rule at once | 29% | 15/96 (15.6%) |
 | v2 | one or two active attributes, single repeated shapes | 59% | 10/96 (10.4%) |
-| v3 | as v2, plus composed panels: nested frames, inner shapes, bars | 61% | **11/96 (11.5%)** |
+| v3 | as v2, plus composed panels: nested frames, inner shapes, bars | 61% | 11/96 (11.5%) |
+| v4 | two generator bugs fixed: 18.6% of problems were unanswerable, and shapes were drawn far too small | 56% | **10/96 (10.4%)** |
 
 And the two rankers that use the symbolic features, on the 70/30 protocol from Part 2 so they are directly comparable:
 
@@ -137,6 +138,56 @@ Epilogue model spend: **$23.34** across 7 runs of 96 problems. Costs for runs ma
 ### GPT-3.5 could not take the test
 
 `gpt-3.5-turbo` has no image input. There is no way to give it the puzzle at all — not a low score, an impossible task. That is worth showing students directly: the model that made ChatGPT famous in 2022 cannot even be entered into this comparison, and the barrier is modality, not reasoning.
+
+---
+
+## Part 4 — Do the models fail on the same problems?
+
+Yes, decisively. Taking the 7 models that score 70% or better:
+
+- **65 of 96 problems** were solved by every one of them.
+- The **14 problems missed by two or more** account for **71% of all errors**.
+- Error sets overlap about **4x more than independent errors would** (Jaccard 0.16 observed against 0.04 for random failures of the same size).
+- And when several models miss the same problem, **63% of them choose the same wrong option** — against roughly 14% for guessing.
+
+Independent labs, different architectures, different training data, converging on the same wrong answer. That is a property of the problems, not of any one model.
+
+### The problems that beat them
+
+| Problem | Correct | Missed by | Answers given | Agreement |
+|---|---|---|---|---|
+| `Challenge B-03` | 3 | 5/7 | 1 (4), 5 (1) | 80% on option 1 |
+| `Challenge B-04` | 4 | 4/7 | 1 (2), 5 (2) | 50% on option 1 |
+| `Challenge D-08` | 1 | 4/7 | 2 (3), 6 (1) | 75% on option 2 |
+| `Challenge E-08` | 7 | 4/7 | 5 (2), 3 (2) | 50% on option 5 |
+| `Challenge E-09` | 1 | 4/7 | 2 (2), 5 (1), 6 (1) | 50% on option 2 |
+| `Basic C-12` | 8 | 3/7 | 5 (1), 7 (1), 6 (1) | 33% on option 5 |
+| `Challenge B-02` | 1 | 3/7 | 5 (1), 3 (1), 4 (1) | 33% on option 5 |
+| `Challenge D-05` | 2 | 3/7 | 8 (2), 3 (1) | 67% on option 8 |
+
+### Why: two rules, and they only apply one
+
+`Challenge B-03` and `B-04` are the same puzzle in squares and circles. Cell A is five nested outlines; cell B is the same five with alternate bands filled black; cell C is three nested outlines. Two rules operate at once: **left-to-right fills alternate bands**, and **top-to-bottom removes two rings** (5 → 3 → 1).
+
+The correct answer to B-03 needs both: one ring, filled — a plain black square. Five of seven strong models answered option 1, which is what you get by applying the fill rule to three rings and never checking the column. Their stated rules give them away:
+
+> *"The right column shows the left column’s concentric squares with alternate rings filled black"* — a correct description of half the puzzle.
+
+The two that solved it stated both rules:
+
+> *"The number of nested squares decreases by 2 both across rows and down columns (5→3→1), and moving left→right changes thin outlines to solid black."*
+
+The system prompt explicitly says to check rows **and** columns before committing. Being told is not enough: the fill transformation is visually loud and the count progression is quiet, and the loud one wins.
+
+### Why: the rule is right and the arithmetic is wrong
+
+`Challenge D-08` is a Latin square over three attributes at once — one, two or three triangles; filled or outline; upright or right-pointing. Four of seven missed it, and this time they *state the rule correctly*:
+
+> *"Each row and column contains one cell with 1, 2, and 3 triangles, while the styles cycle among filled upright, outlined upright, and outlined right-pointing"* — then picks the wrong cell.
+
+That is not a reasoning failure, it is a bookkeeping failure: three constraints have to be intersected simultaneously and the models lose track. It is exactly the operation the classical agent does perfectly and for free, because it is a loop over permutations rather than something held in mind.
+
+Which is the useful shape of the result. The LLMs are far better at *noticing* what kind of rule is present; they are worse at the exhaustive checking once they have. Set B’s 2x2 problems, where there is only one row to learn the rule from and no second line to confirm it against, are where they lose most ground.
 
 ---
 

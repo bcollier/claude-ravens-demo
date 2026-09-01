@@ -11,6 +11,11 @@ for reasons you cannot name:
      pick the option most similar to a panel already visible, and how often is
      that actually the right answer?
 
+  3. Base-rate comparison. How often is that option correct in the *training*
+     distribution versus the real one? If the two differ, the network is not
+     malfunctioning -- it has faithfully learned a regularity that does not
+     hold where it is being tested.
+
 Usage:  python 04_neural/diagnose.py [--tag relationnet]
 """
 from __future__ import annotations
@@ -29,6 +34,7 @@ sys.path[:0] = [HERE, os.path.join(ROOT, "common"), os.path.join(ROOT, "02_class
 
 import ravens            # noqa: E402
 import imageops as io    # noqa: E402
+import render            # noqa: E402
 import wren              # noqa: E402
 import solver as nsolver # noqa: E402
 
@@ -60,6 +66,26 @@ def duplicate_shortcut(scores):
     return pick_dup / len(ps), truth_dup / len(ps)
 
 
+def base_rates(n_synth=300, seed=5):
+    """How often is the most-duplicating option correct, synthetic vs real?"""
+    import random
+    rng = random.Random(seed)
+    hits = 0
+    for _ in range(n_synth):
+        ctx, opts, ans, _ = render.make_problem(rng, True)
+        sims = [max(io.sim(o < 128, c < 128) for c in ctx) for o in opts]
+        hits += int(np.argmax(sims)) == ans
+    synth = hits / n_synth
+
+    ps = ravens.load_all()
+    real = 0
+    for p in ps:
+        g = [p.image(x) for x in p.givens]
+        sims = [max(io.sim(p.image(c), x) for x in g) for c in p.choices]
+        real += int(np.argmax(sims)) == p.answer - 1
+    return synth, real / len(ps)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", default="relationnet")
@@ -74,6 +100,7 @@ def main():
     cb = context_blind(model, dev)
     scores = np.load(os.path.join(ROOT, "results", f"neural_{args.tag}_scores.npy"))
     pick, truth = duplicate_shortcut(scores)
+    synth_rate, real_rate = base_rates()
 
     lines = [
         f"context-blind test (synthetic)",
@@ -83,6 +110,10 @@ def main():
         f"duplicate-shortcut test (real 96)",
         f"  model picks the option most like a visible panel   {pick:.0%}",
         f"  that option is actually correct                    {truth:.0%}",
+        f"",
+        f"base rate of that shortcut in each world",
+        f"  correct in SYNTHETIC training problems             {synth_rate:.0%}",
+        f"  correct in the REAL 96                             {real_rate:.0%}",
     ]
     out = "\n".join(lines)
     print(out)

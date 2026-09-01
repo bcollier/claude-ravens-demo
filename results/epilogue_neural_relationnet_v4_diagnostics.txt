@@ -1,0 +1,11 @@
+context-blind test (synthetic)
+  full problem                      55.7%
+  every context panel erased        12.3%   (chance ~13%)
+
+duplicate-shortcut test (real 96)
+  model picks the option most like a visible panel   30%
+  that option is actually correct                    10%
+
+base rate of that shortcut in each world
+  correct in SYNTHETIC training problems             26%
+  correct in the REAL 96                             10%
