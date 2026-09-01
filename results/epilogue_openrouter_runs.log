@@ -1,0 +1,17 @@
+=== anthropic/claude-fable-5 ===
+    anthropic/claude-fable-5: 12/96 done, 12 correct
+    anthropic/claude-fable-5: 24/96 done, 24 correct
+    anthropic/claude-fable-5: 36/96 done, 36 correct
+    anthropic/claude-fable-5: 48/96 done, 48 correct
+    anthropic/claude-fable-5: 60/96 done, 59 correct
+    anthropic/claude-fable-5: 72/96 done, 70 correct
+    anthropic/claude-fable-5: 84/96 done, 79 correct
+    anthropic/claude-fable-5: 96/96 done, 89 correct
+  anthropic/claude-fable-5                     89/96 = 92.7%  $ 4.805    146s  0 unparseable
+=== google/gemini-3.1-pro-preview ===
+    google/gemini-3.1-pro-preview: 12/96 done, 10 correct
+    google/gemini-3.1-pro-preview: 24/96 done, 22 correct
+    google/gemini-3.1-pro-preview: 36/96 done, 34 correct
+    google/gemini-3.1-pro-preview: 48/96 done, 46 correct
+    google/gemini-3.1-pro-preview: 60/96 done, 55 correct
+    google/gemini-3.1-pro-preview: 72/96 done, 66 correct

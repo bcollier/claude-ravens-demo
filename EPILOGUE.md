@@ -18,6 +18,8 @@ You cannot train a network on 96 examples. The standard way round it, and what t
 
 `04_neural/wren.py` is a relation network in the style of Santoro et al.'s WReN. Each panel goes through a small CNN to a 128-dimensional embedding tagged with its grid position; every *pair* of panels goes through a shared MLP; the pair representations are summed and a head scores the candidate. The pairwise sum is the whole point — a rule in a Raven's matrix is a statement about how two cells relate, so the architecture is built to compute exactly that.
 
+About 398,817 parameters, trained on mps in 1079 seconds.
+
 ### Results
 
 Three versions of the *same network and the same training budget*. Only the generator changed.
@@ -26,13 +28,14 @@ Three versions of the *same network and the same training budget*. Only the gene
 |---|---|---|---|
 | v1 | every attribute given its own rule at once | 29% | 15/96 (15.6%) |
 | v2 | one or two active attributes, single repeated shapes | 59% | 10/96 (10.4%) |
+| v3 | as v2, plus composed panels: nested frames, inner shapes, bars | 61% | **11/96 (11.5%)** |
 
 And the two rankers that use the symbolic features, on the 70/30 protocol from Part 2 so they are directly comparable:
 
 | Ranker | Features | 70/30 test accuracy |
 |---|---|---|
-| linear (in class) | 48 symbolic rule features | 65.5% ± 5.6% |
-| **MLP** | the same 48 features, a small neural network | 62.1% ± 5.6% |
+| linear (in class) | 48 symbolic rule features | 61.6% ± 6.7% |
+| **MLP** | the same 48 features, a small neural network | 59.0% ± 9.7% |
 
 ### What this shows
 
@@ -58,16 +61,18 @@ A diagnostic worth copying: blanking every context panel and re-scoring drops th
 
 ### The 70/30 numbers
 
-Stratified by problem set, 67 train / 29 test, hyper-parameters chosen on the training half only, repeated over 3 random seeds.
+Stratified by problem set, 67 train / 29 test, hyper-parameters chosen on the training half only, repeated over 20 random seeds.
 
 | Ranker | 70/30 test accuracy | Spread across seeds | In-class leave-one-set-out |
 |---|---|---|---|
-| linear | **65.5%** | 59% – 72% (± 5.6%) | 61.5% |
-| mlp | **62.1%** | 55% – 69% (± 5.6%) | — |
+| linear | **61.6%** | 52% – 76% (± 6.7%) | 61.5% |
+| mlp | **59.0%** | 38% – 79% (± 9.7%) | — |
 
-**The random split scores *higher* than leave-one-set-out, and that is expected.** A random 70/30 puts problems from every set in the training half, so at test time the model has already seen the family of rules it is being asked about. Leave-one-set-out withholds a whole family. The gap between the two is a measure of how much the agent relies on having seen that kind of problem before — and it is the more useful number if you care whether the thing generalises.
+**The two protocols agree.** Leave-one-problem-set-out gave 61.5%; a random 70/30 gives 61.6%, a difference of 0.1 points — well inside the noise. The in-class number was not flattered by its protocol.
 
-Note also the spread. On 29 test problems, one problem is 3.4 percentage points, so a single split's number is nearly meaningless on its own; only the distribution over seeds means anything.
+**Look at the spread, though.** Across 20 seeds the same procedure produced anything from 52% to 76%. On 29 test problems one answer is 3.4 percentage points, so a single train/test split of a dataset this size tells you almost nothing — the honest report is the distribution, not a number. An earlier three-seed run of exactly this code read 65.5%; twenty seeds put it at 61.6%.
+
+**The neural ranker is worse and far less stable**: 59.0% ± 9.7% against the linear ranker's 61.6% ± 6.7%, with individual seeds ranging 38% to 79%. With 67 training problems and 48 features there is not enough signal for an MLP to find structure a linear model misses, and plenty of room for it to find structure that is not there.
 
 ---
 
@@ -75,29 +80,31 @@ Note also the spread. On 29 test problems, one problem is 3.4 percentage points,
 
 Identical inputs, identical prompt, one call per problem. Only the model changes.
 
-| Model | Lab | Score | Accuracy | Cost | Cost per correct | Wall clock | Input tok | Output tok | In class? |
-|---|---|---|---|---|---|---|---|---|---|
-| `gpt-5.6-sol` | OpenAI | 93/96 | **96.9%** | $0.78 | $0.0084 | 77 s | 243,912 | 29,504 | yes |
-| `gpt-5.6-terra` | OpenAI | 89/96 | **92.7%** | $1.02 | $0.01 | 193 s | 243,912 | 44,419 | yes |
-| `gpt-5` | OpenAI | 84/96 | **87.5%** | $5.33 | $0.06 | 1773 s | 383,928 | 484,800 | yes |
-| `gpt-4o` | OpenAI | 41/96 | **42.7%** | $1.17 | $0.03 | 36 s | 454,896 | 3,687 | no |
-| `gpt-4.1` | OpenAI | 36/96 | **37.5%** | $0.95 | $0.03 | 33 s | 454,896 | 5,435 | no |
-| `gpt-4-turbo` | OpenAI | 34/96 | **35.4%** | $4.68 | $0.14 | 101 s | 454,896 | 4,299 | no |
-| `o3` | OpenAI | 0/96 | **0.0%** | $0.0000 | — | 120 s | 0 | 0 | no |
+| Model | Lab | Score | Accuracy | Cost | Cost per correct | Wall clock | Input tok | Output tok | No answer | In class? |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `gpt-5.6-sol` | OpenAI | 93/96 | **96.9%** | $0.78 | $0.0084 | 77 s | 243,912 | 29,504 | — | yes |
+| `anthropic/claude-fable-5` | Anthropic | 89/96 | **92.7%** | $4.80 | $0.05 | 146 s | 283,488 | 39,402 | — | no |
+| `gpt-5.6-terra` | OpenAI | 89/96 | **92.7%** | $1.02 | $0.01 | 193 s | 243,912 | 44,419 | — | yes |
+| `gpt-5` | OpenAI | 84/96 | **87.5%** | $5.33 | $0.06 | 1773 s | 383,928 | 484,800 | — | yes |
+| `o3` | OpenAI | 76/96 | **79.2%** | $3.59 | $0.05 | 947 s | 405,120 | 347,404 | — | no |
+| `gpt-4o` | OpenAI | 41/96 | **42.7%** | $1.17 | $0.03 | 36 s | 454,896 | 3,687 | — | no |
+| `gpt-4.1` | OpenAI | 36/96 | **37.5%** | $0.95 | $0.03 | 33 s | 454,896 | 5,435 | — | no |
+| `gpt-4-turbo` | OpenAI | 34/96 | **35.4%** | $4.68 | $0.14 | 101 s | 454,896 | 4,299 | — | no |
 
-Epilogue model spend: **$6.81** across 4 runs of 96 problems.
+Epilogue model spend: **$15.20** across 5 runs of 96 problems. Costs for runs made through OpenRouter are the amount actually charged; the OpenAI-direct runs are token counts times list price.
 
 ### By problem set
 
 | Model | Basic B | Basic C | Basic D | Basic E | Challenge B | Challenge C | Challenge D | Challenge E |
 |---|---|---|---|---|---|---|---|---|
 | `gpt-5.6-sol` | 12 | 12 | 12 | 12 | 11 | 12 | 11 | 11 |
+| `anthropic/claude-fable-5` | 12 | 12 | 12 | 12 | 10 | 12 | 10 | 9 |
 | `gpt-5.6-terra` | 12 | 12 | 12 | 11 | 10 | 12 | 11 | 9 |
 | `gpt-5` | 11 | 12 | 12 | 11 | 8 | 12 | 9 | 9 |
+| `o3` | 11 | 9 | 12 | 9 | 7 | 12 | 7 | 9 |
 | `gpt-4o` | 7 | 6 | 5 | 7 | 4 | 7 | 3 | 2 |
 | `gpt-4.1` | 8 | 7 | 4 | 3 | 5 | 5 | 2 | 2 |
 | `gpt-4-turbo` | 7 | 8 | 3 | 4 | 5 | 4 | 2 | 1 |
-| `o3` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 ### GPT-3.5 could not take the test
 

@@ -30,7 +30,9 @@ OUT = 64
 # Chosen to cover the shapes the real problem sets actually use.
 SHAPES = ["circle", "square", "triangle", "pentagon", "hexagon", "octagon", "star",
           "diamond", "plus", "heart", "pacman", "right_triangle"]
-SCALES = [0.34, 0.48, 0.62, 0.78]
+# Real panels fill most of the frame; an earlier version drew everything far
+# too small, which was the single biggest visual mismatch with the real sets.
+SCALES = [0.42, 0.56, 0.70, 0.84]
 ANGLES = [0, 30, 45, 60, 90, 135]
 FILLS = [0, 1]
 COUNTS = [1, 2, 3, 4]
@@ -106,9 +108,9 @@ def draw_shape(d, shape, cx, cy, r, fill, angle, width=3):
 
 
 LAYOUTS = {1: [(0.5, 0.5)],
-           2: [(0.32, 0.5), (0.68, 0.5)],
-           3: [(0.5, 0.28), (0.3, 0.7), (0.7, 0.7)],
-           4: [(0.32, 0.32), (0.68, 0.32), (0.32, 0.68), (0.68, 0.68)]}
+           2: [(0.28, 0.5), (0.72, 0.5)],
+           3: [(0.5, 0.26), (0.27, 0.72), (0.73, 0.72)],
+           4: [(0.28, 0.28), (0.72, 0.28), (0.28, 0.72), (0.72, 0.72)]}
 
 
 def _mask_of(draw_fn, filled=True):
@@ -167,7 +169,7 @@ def render(attrs, jitter=0.0, width=3) -> np.ndarray:
     d = ImageDraw.Draw(im)
     n = attrs["count"]
     spots = LAYOUTS[n]
-    shrink = {1: 1.0, 2: 0.62, 3: 0.5, 4: 0.46}[n]
+    shrink = {1: 1.0, 2: 0.66, 3: 0.55, 4: 0.52}[n]
     r = attrs["scale"] * SIZE * 0.5 * shrink
     jx = random.uniform(-jitter, jitter) * SIZE
     jy = random.uniform(-jitter, jitter) * SIZE
@@ -217,7 +219,15 @@ def make_attribute_problem(rng, three=True, n_active=None):
     cols = 3 if three else 2
     if n_active is None:
         n_active = rng.choice([1, 1, 2])
-    active = rng.sample(ATTRS, n_active)
+
+    # Decide the panel style FIRST, then pick active attributes only from the
+    # ones that style can actually express. Choosing first and forcing after
+    # silently produced matrices whose every panel was identical -- unsolvable
+    # training examples the network was being asked to learn from.
+    composed = rng.random() < 0.45
+    usable = (["shape", "scale", "fill", "angle", "inner", "bars", "frames"] if composed
+              else ["shape", "scale", "fill", "angle", "count"])
+    active = rng.sample(usable, min(n_active, len(usable)))
 
     plan = {}
     for attr in ATTRS:
@@ -230,7 +240,6 @@ def make_attribute_problem(rng, three=True, n_active=None):
         plan[attr] = rng.choice(kinds)
 
     grid = [[dict() for _ in range(cols)] for _ in range(rows)]
-    composed = rng.random() < 0.45
     for attr in ATTRS:
         kind = plan[attr]
         dom = DOMAIN[attr]

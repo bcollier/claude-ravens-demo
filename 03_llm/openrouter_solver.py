@@ -29,6 +29,10 @@ from openai import OpenAI                       # noqa: E402
 from solver import SYSTEM, data_url as data_uri  # noqa: E402  (same prompt as in class)
 
 BASE_URL = "https://openrouter.ai/api/v1"
+# The key is read from OPENROUTER_API_KEY, or from a local file that is
+# gitignored and never printed. The file wins, so you can drop a fresh key in
+# without restarting anything.
+KEY_FILE = os.path.expanduser("~/.openrouter_key")
 OUT_DIR = os.path.join(HERE, "..", "results")
 
 # One flagship vision model per lab, plus two historical OpenAI models.
@@ -42,9 +46,9 @@ LINEUP = [
     "deepseek/deepseek-v4-flash-vision-exp",
     "meta-llama/llama-4-maverick",
     "z-ai/glm-5v-turbo",
-    "openai/gpt-4o",
-    "openai/gpt-4-turbo",
 ]
+# gpt-4o / gpt-4-turbo / gpt-4.1 / o3 were run straight against OpenAI instead,
+# so their token counts are directly comparable with the in-class sweeps.
 
 ASK = ("Reply with ONLY a JSON object of the form "
        '{"rule": "<one sentence>", "answer": <option number>, "confidence": <0-1>}.')
@@ -149,10 +153,22 @@ def ask(client, model, problem, retries=4, route="openrouter"):
             time.sleep(2 ** attempt + random.random())
 
 
+def openrouter_key():
+    if os.path.exists(KEY_FILE):
+        key = open(KEY_FILE).read().strip()
+        if key:
+            return key
+    key = os.environ.get("OPENROUTER_API_KEY", "")
+    if not key:
+        raise SystemExit(f"No OpenRouter key. Put one in {KEY_FILE} "
+                         f"or export OPENROUTER_API_KEY.")
+    return key
+
+
 def make_client(route):
     if route == "openai":
         return OpenAI(api_key=os.environ["OPENAI_API_KEY"], timeout=600)
-    return OpenAI(base_url=BASE_URL, api_key=os.environ["OPENROUTER_API_KEY"], timeout=600,
+    return OpenAI(base_url=BASE_URL, api_key=openrouter_key(), timeout=600,
                   default_headers={
                       "HTTP-Referer": "https://github.com/bcollier/claude-ravens-demo",
                       "X-Title": "Claude Ravens Demo"})

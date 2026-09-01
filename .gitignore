@@ -7,3 +7,6 @@ SetResults.csv
 .DS_Store
 .idea/
 .venv/
+
+# never commit an API key
+.openrouter_key

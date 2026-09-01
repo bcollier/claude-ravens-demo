@@ -106,6 +106,12 @@ def main():
     sp = os.path.join(RESULTS, "epilogue_split_eval.json")
     if os.path.exists(sp):
         split = json.load(open(sp))
+    inclass_cv = None
+    cs = os.path.join(RESULTS, "classical_summary.txt")
+    if os.path.exists(cs):
+        for line in open(cs):
+            if line.startswith("rule_search_plus_ranker"):
+                inclass_cv = float(line.split(":")[1])
 
     w("# Epilogue: comparisons added after class\n")
     w("Everything in [COMPARISON.md](COMPARISON.md) is exactly as it ran during the "
@@ -153,12 +159,17 @@ def main():
          "one or two active attributes, single repeated shapes"),
         ("v3", "epilogue_neural_relationnet_summary.txt",
          "as v2, plus composed panels: nested frames, inner shapes, bars"),
+        ("v4", "epilogue_neural_relationnet_v4_summary.txt",
+         "two generator bugs fixed: 18.6% of problems were unanswerable, and "
+         "shapes were drawn far too small"),
     ]
+    last = [t for t, fn, _ in variants
+            if read_summary(os.path.join(RESULTS, fn))][-1:]
     for tag, fn, desc in variants:
         d = read_summary(os.path.join(RESULTS, fn))
         if not d:
             continue
-        bold = "**" if tag == "v3" else ""
+        bold = "**" if [tag] == last else ""
         w(f"| {tag} | {desc} | {float(d.get('synthetic_val',0)):.0%} | "
           f"{bold}{d.get('correct','?')}/96 ({float(d.get('accuracy',0)):.1%}){bold} |")
     w("")
@@ -186,6 +197,14 @@ def main():
       "over v1 and did *worse* on the real problems. A network can only learn the world "
       "you show it, and the gap between that world and the real one does not appear "
       "anywhere in the training metrics.\n")
+    w("**Two of the biggest problems were in the data, and only looking at it found "
+      "them.** Rendering the training panels next to the real ones at the size the "
+      "network actually sees revealed that synthetic shapes were drawn far too small, "
+      "and — worse — that the generator chose which attributes a rule acts on *before* "
+      "deciding whether the panel could express them, silently erasing the variation in "
+      "**18.6% of training problems** and leaving eight identical panels with an "
+      "unanswerable question. The loss curve looked healthy throughout. No metric "
+      "reported it.\n")
     w("A diagnostic worth copying: blanking every context panel and re-scoring drops "
       "the network to chance on synthetic problems. So it genuinely reads the matrix "
       "rather than exploiting a giveaway in how the distractors were made — the failure "
@@ -232,16 +251,34 @@ def main():
             w(f"| {kind} | **{d['mean']:.1%}** | {d['min']:.0%} – {d['max']:.0%} "
               f"(± {d['std']:.1%}) | {ref.get(kind,'—')} |")
         w("")
-        w("**The random split scores *higher* than leave-one-set-out, and that is "
-          "expected.** A random 70/30 puts problems from every set in the training "
-          "half, so at test time the model has already seen the family of rules it is "
-          "being asked about. Leave-one-set-out withholds a whole family. The gap "
-          "between the two is a measure of how much the agent relies on having seen "
-          "that kind of problem before — and it is the more useful number if you care "
-          "whether the thing generalises.\n")
-        w("Note also the spread. On 29 test problems, one problem is 3.4 percentage "
-          "points, so a single split's number is nearly meaningless on its own; only "
-          "the distribution over seeds means anything.\n")
+        lin = split.get("linear", {})
+        if lin and inclass_cv is not None:
+            delta = lin["mean"] - inclass_cv
+            w(f"**The two protocols agree.** Leave-one-problem-set-out gave "
+              f"{inclass_cv:.1%}; a random 70/30 gives {lin['mean']:.1%}, a difference of "
+              f"{abs(delta)*100:.1f} points — well inside the noise. The in-class number "
+              f"was not flattered by its protocol.\n"
+              if abs(delta) < 0.03 else
+              f"**The random split scores {'higher' if delta > 0 else 'lower'} than "
+              f"leave-one-set-out** ({lin['mean']:.1%} against {inclass_cv:.1%}). A random "
+              f"split puts problems from every set in the training half, so at test time "
+              f"the model has already met the family of rules it is being asked about; "
+              f"leave-one-set-out withholds a whole family.\n")
+            w(f"**Look at the spread, though.** Across {lin['seeds']} seeds the same "
+              f"procedure produced anything from {lin['min']:.0%} to {lin['max']:.0%}. On "
+              f"29 test problems one answer is 3.4 percentage points, so a single "
+              f"train/test split of a dataset this size tells you almost nothing — the "
+              f"honest report is the distribution, not a number. An earlier three-seed "
+              f"run of exactly this code read 65.5%; twenty seeds put it at "
+              f"{lin['mean']:.1%}.\n")
+        if "mlp" in split and "linear" in split:
+            m, l = split["mlp"], split["linear"]
+            w(f"**The neural ranker is worse and far less stable**: {m['mean']:.1%} "
+              f"± {m['std']:.1%} against the linear ranker's {l['mean']:.1%} "
+              f"± {l['std']:.1%}, with individual seeds ranging {m['min']:.0%} to "
+              f"{m['max']:.0%}. With 67 training problems and 48 features there is not "
+              f"enough signal for an MLP to find structure a linear model misses, and "
+              f"plenty of room for it to find structure that is not there.\n")
 
     # ---------------------------------------------------------- part 3
     epi_runs = load_llm_runs()
@@ -252,18 +289,30 @@ def main():
           "changes.\n")
         allruns = sorted(epi_runs + inclass, key=lambda r: -r["correct"])
         w("| Model | Lab | Score | Accuracy | Cost | Cost per correct | Wall clock | "
-          "Input tok | Output tok | In class? |")
-        w("|---|---|---|---|---|---|---|---|---|---|")
+          "Input tok | Output tok | No answer | In class? |")
+        w("|---|---|---|---|---|---|---|---|---|---|---|")
         for r in allruns:
             cpc = money(r["cost"] / r["correct"]) if r["correct"] else "—"
+            bad = r.get("unparseable", 0)
             w(f"| `{r['model']}` | {r['lab']} | {r['correct']}/{N} | "
               f"**{r['correct']/N:.1%}** | {money(r['cost'])} | {cpc} | "
               f"{r['wall']:.0f} s | {r['in_tok']:,} | {r['out_tok']:,} | "
-              f"{'yes' if r.get('inclass') else 'no'} |")
+              f"{bad if bad else '—'} | {'yes' if r.get('inclass') else 'no'} |")
         w("")
         total = sum(r["cost"] for r in epi_runs)
         w(f"Epilogue model spend: **{money(total)}** across {len(epi_runs)} runs of 96 "
-          f"problems.\n")
+          f"problems. Costs for runs made through OpenRouter are the amount actually "
+          f"charged; the OpenAI-direct runs are token counts times list price.\n")
+        bad_any = [r for r in allruns if r.get("unparseable")]
+        if bad_any:
+            w("**\"No answer\" is a harness result, not a model result.** A reply that "
+              "cannot be parsed scores zero, and the first pass here produced some "
+              "spectacular false zeros: an 8,000-token output budget let reasoning "
+              "models spend the whole allowance thinking and return an empty message, "
+              "`gpt-4-turbo` rejects any budget above 4,096, and o-series models reject "
+              "the `max_tokens` parameter outright. All three scored 0/96 until the "
+              "harness was fixed. If you are benchmarking models, assume a suspiciously "
+              "round zero is your bug before it is theirs.\n")
 
         w("### By problem set\n")
         w("| Model | " + " | ".join(ravens.set_label(s) for s in ravens.SET_ORDER) + " |")

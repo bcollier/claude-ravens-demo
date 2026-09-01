@@ -1,0 +1,9 @@
+model            : relation network (WReN-style), 398817 params
+trained_on       : synthetic matrices only, never the real 96
+steps            : 8000
+batch            : 32
+device           : mps
+train_seconds    : 1078.9
+synthetic_val    : 0.6133
+correct          : 11
+accuracy         : 0.1146

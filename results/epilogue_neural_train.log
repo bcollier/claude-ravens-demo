@@ -10,3 +10,38 @@ training the relation network on synthetic matrices (8000 steps x batch 32) ...
   step  2000  loss 1.337  synthetic-val 31.6%  (259s)
   step  2250  loss 1.267  synthetic-val 35.5%  (294s)
   step  2500  loss 1.362  synthetic-val 36.7%  (329s)
+  step  2750  loss 0.962  synthetic-val 41.4%  (365s)
+  step  3000  loss 1.120  synthetic-val 50.0%  (400s)
+  step  3250  loss 1.282  synthetic-val 54.3%  (433s)
+  step  3500  loss 1.482  synthetic-val 48.4%  (467s)
+  step  3750  loss 1.204  synthetic-val 52.7%  (501s)
+  step  4000  loss 1.116  synthetic-val 53.9%  (536s)
+  step  4250  loss 1.080  synthetic-val 58.6%  (571s)
+  step  4500  loss 0.784  synthetic-val 53.5%  (605s)
+  step  4750  loss 1.064  synthetic-val 54.3%  (640s)
+  step  5000  loss 0.868  synthetic-val 62.9%  (674s)
+  step  5250  loss 0.914  synthetic-val 57.8%  (707s)
+  step  5500  loss 1.089  synthetic-val 58.2%  (741s)
+  step  5750  loss 0.767  synthetic-val 58.2%  (777s)
+  step  6000  loss 0.938  synthetic-val 59.4%  (814s)
+  step  6250  loss 0.989  synthetic-val 58.6%  (850s)
+  step  6500  loss 0.719  synthetic-val 58.2%  (886s)
+  step  6750  loss 0.763  synthetic-val 60.5%  (924s)
+  step  7000  loss 0.696  synthetic-val 60.2%  (959s)
+  step  7250  loss 0.934  synthetic-val 60.2%  (996s)
+  step  7500  loss 1.132  synthetic-val 60.5%  (1024s)
+  step  7750  loss 0.875  synthetic-val 60.2%  (1051s)
+  step  8000  loss 0.872  synthetic-val 61.3%  (1078s)
+
+D1 relation network on the real 96: 11/96 = 11.5%
+  Basic Problems B            3/12
+  Basic Problems C            2/12
+  Basic Problems D            1/12
+  Basic Problems E            1/12
+  Challenge Problems B        2/12
+  Challenge Problems C        0/12
+  Challenge Problems D        1/12
+  Challenge Problems E        1/12
+
+synthetic validation accuracy at the end of training: 61.3%
+total 1080s
