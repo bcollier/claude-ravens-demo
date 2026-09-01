@@ -1,0 +1,5 @@
+rule_search_only        : 0.5104
+rule_search_plus_ranker : 0.6146
+leave_one_problem_out   : 0.5833
+runtime_seconds         : 61.92
+hyperparams_per_fold    : {'Basic Problems B': (0.8, 1.0, 0.03), 'Basic Problems C': (0.5, 1.0, 0.03), 'Basic Problems D': (1.2, 1.0, 0.01), 'Basic Problems E': (0.5, 1.0, 0.3), 'Challenge Problems B': (0.8, 1.0, 0.1), 'Challenge Problems C': (0.8, 1.0, 0.3), 'Challenge Problems D': (1.2, 1.0, 0.1), 'Challenge Problems E': (1.2, 2.0, 1.0)}

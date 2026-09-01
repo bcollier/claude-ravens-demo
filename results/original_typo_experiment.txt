@@ -1,0 +1,5 @@
+variant                             correct    of 96
+as shipped (2017)                        34   35.4%
+fix the + typo only                      34   35.4%
+fix the duplicated IPR_COL only          34   35.4%
+fix both                                 33   34.4%

@@ -1,0 +1,8 @@
+# Agents 1 and 2 (local, no network)
+numpy>=1.24
+Pillow>=9.0
+scipy>=1.10
+scikit-learn>=1.2
+
+# Agent 3 (LLM) -- needs OPENAI_API_KEY in the environment
+openai>=1.60
