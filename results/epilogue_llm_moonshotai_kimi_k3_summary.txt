@@ -1,0 +1,12 @@
+model            : moonshotai/kimi-k3
+provider_route   : openrouter
+problems         : 96
+correct          : 92
+accuracy         : 0.9583
+wall_seconds     : 2157.20
+workers          : 8
+cost_usd         : 6.9548
+unparseable      : 1
+input_tokens     : 281129
+output_tokens    : 414388
+reasoning_tokens : 408347

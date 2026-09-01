@@ -321,14 +321,38 @@ def main():
     w("")
     w("Costs are for all 96 puzzles. Times are for the whole sweep with ten requests "
       "running at once.\n")
-    w("### Three things worth noticing\n")
-    w("**The price spread is far wider than the accuracy spread.** Among the top "
-      "models a few percentage points of accuracy separate them, while the cost varies "
-      "by roughly ten times. Picking the biggest, most expensive model is usually the "
-      "wrong default — a newer cheap model routinely beats an older expensive one.\n")
+    w("### What stands out\n")
+    top = [r for r in runs if r["correct"] >= max(x["correct"] for x in runs) - 1]
+    tie = {}
+    for r in runs:
+        tie.setdefault(r["correct"], []).append(r)
+    cluster = max(tie.items(), key=lambda kv: (len(kv[1]), kv[0]))[1] if tie else []
+    if len(cluster) >= 3:
+        lo = min(cluster, key=lambda r: r["cost"])
+        hi = max(cluster, key=lambda r: r["cost"])
+        w(f"**The price spread is far wider than the accuracy spread.** "
+          f"{len(cluster)} different models from {len({(r['model'].split('/')[0] if '/' in r['model'] else 'openai') for r in cluster})} "
+          f"companies tied on exactly {cluster[0]['correct']}/{N} — and the cheapest of "
+          f"them cost ${lo['cost']:.2f} while the dearest cost ${hi['cost']:.2f}, "
+          f"{hi['cost']/max(lo['cost'],0.01):.1f} times more for an identical score. "
+          f"Across the whole table the best model is also close to the cheapest. "
+          f"Picking the biggest, most expensive option is usually the wrong default.\n")
+    else:
+        w("**The price spread is far wider than the accuracy spread.** Among the top "
+          "models a few percentage points of accuracy separate them, while the cost "
+          "varies by roughly ten times. Picking the biggest, most expensive model is "
+          "usually the wrong default.\n")
     w("**Progress over two years is dramatic.** The same family of models went from "
       "the mid-thirties to the mid-nineties. For context, the mid-thirties is what the "
       "2017 student program scores.\n")
+    below = [r for r in runs if r["correct"] < n_clas]
+    if below:
+        w(f"**Being a language model is not enough on its own.** "
+          f"{len(below)} of the {len(runs)} scored *below* the hand-written program "
+          f"with no AI in it at all — "
+          + ", ".join(f"`{r['model']}` at {r['correct']}/{N}" for r in below[:4])
+          + f", against {n_clas}/{N}. \"We used AI\" tells you almost nothing; which "
+          f"model, and how it was asked, is most of the outcome.\n")
     w("**One model could not sit the test at all.** `gpt-3.5-turbo`, the model that "
       "made ChatGPT famous in 2022, cannot accept images. Not a low score — no score. "
       "The barrier is what it can perceive, not how well it reasons.\n")

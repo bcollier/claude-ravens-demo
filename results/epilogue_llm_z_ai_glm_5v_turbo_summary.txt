@@ -1,0 +1,12 @@
+model            : z-ai/glm-5v-turbo
+provider_route   : openrouter
+problems         : 96
+correct          : 77
+accuracy         : 0.8021
+wall_seconds     : 590.09
+workers          : 8
+cost_usd         : 1.3603
+unparseable      : 0
+input_tokens     : 274680
+output_tokens    : 262712
+reasoning_tokens : 256023

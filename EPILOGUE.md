@@ -103,17 +103,22 @@ Identical inputs, identical prompt, one call per problem. Only the model changes
 |---|---|---|---|---|---|---|---|---|---|---|
 | `gpt-5.6-sol` | OpenAI | 93/96 | **96.9%** | $0.78 | $0.0084 | 77 s | 243,912 | 29,504 | — | yes |
 | `google/gemini-3.7-flash` | Google | 92/96 | **95.8%** | $1.50 | $0.02 | 144 s | 1,624,800 | 74,659 | — | no |
+| `moonshotai/kimi-k3` | Moonshot | 92/96 | **95.8%** | $6.95 | $0.08 | 2157 s | 281,129 | 414,388 | 1 | no |
+| `qwen/qwen3.8-max` | Alibaba | 92/96 | **95.8%** | $1.44 | $0.02 | 550 s | 260,451 | 159,604 | 1 | no |
 | `x-ai/grok-4.6` | xAI | 92/96 | **95.8%** | $3.87 | $0.04 | 1794 s | 229,416 | 574,014 | 1 | no |
 | `google/gemini-3.1-pro-preview` | Google | 90/96 | **93.8%** | $6.64 | $0.07 | 344 s | 1,602,428 | 285,994 | 2 | no |
 | `anthropic/claude-fable-5` | Anthropic | 89/96 | **92.7%** | $4.80 | $0.05 | 146 s | 283,488 | 39,402 | — | no |
 | `gpt-5.6-terra` | OpenAI | 89/96 | **92.7%** | $1.02 | $0.01 | 193 s | 243,912 | 44,419 | — | yes |
 | `gpt-5` | OpenAI | 84/96 | **87.5%** | $5.33 | $0.06 | 1773 s | 383,928 | 484,800 | — | yes |
+| `z-ai/glm-5v-turbo` | Zhipu | 77/96 | **80.2%** | $1.36 | $0.02 | 590 s | 274,680 | 262,712 | — | no |
 | `o3` | OpenAI | 76/96 | **79.2%** | $3.59 | $0.05 | 947 s | 405,120 | 347,404 | — | no |
+| `deepseek/deepseek-v4-flash-vision-exp` | DeepSeek | 51/96 | **53.1%** | $0.53 | $0.01 | 582 s | 231,648 | 432,617 | — | no |
 | `gpt-4o` | OpenAI | 41/96 | **42.7%** | $1.17 | $0.03 | 36 s | 454,896 | 3,687 | — | no |
+| `meta-llama/llama-4-maverick` | Meta | 41/96 | **42.7%** | $0.10 | $0.0024 | 96 s | 470,832 | 4,829 | — | no |
 | `gpt-4.1` | OpenAI | 36/96 | **37.5%** | $0.95 | $0.03 | 33 s | 454,896 | 5,435 | — | no |
 | `gpt-4-turbo` | OpenAI | 34/96 | **35.4%** | $4.68 | $0.14 | 101 s | 454,896 | 4,299 | — | no |
 
-Epilogue model spend: **$27.20** across 8 runs of 96 problems. Costs for runs made through OpenRouter are the amount actually charged; the OpenAI-direct runs are token counts times list price.
+Epilogue model spend: **$37.59** across 13 runs of 96 problems. Costs for runs made through OpenRouter are the amount actually charged; the OpenAI-direct runs are token counts times list price.
 
 **A "no answer" has two very different causes, and they are worth separating.**
 
@@ -127,13 +132,18 @@ Epilogue model spend: **$27.20** across 8 runs of 96 problems. Costs for runs ma
 |---|---|---|---|---|---|---|---|---|
 | `gpt-5.6-sol` | 12 | 12 | 12 | 12 | 11 | 12 | 11 | 11 |
 | `google/gemini-3.7-flash` | 12 | 11 | 12 | 12 | 9 | 12 | 12 | 12 |
+| `moonshotai/kimi-k3` | 12 | 10 | 12 | 11 | 11 | 12 | 12 | 12 |
+| `qwen/qwen3.8-max` | 11 | 12 | 12 | 12 | 10 | 12 | 12 | 11 |
 | `x-ai/grok-4.6` | 11 | 12 | 12 | 11 | 10 | 12 | 12 | 12 |
 | `google/gemini-3.1-pro-preview` | 10 | 11 | 12 | 12 | 9 | 12 | 12 | 12 |
 | `anthropic/claude-fable-5` | 12 | 12 | 12 | 12 | 10 | 12 | 10 | 9 |
 | `gpt-5.6-terra` | 12 | 12 | 12 | 11 | 10 | 12 | 11 | 9 |
 | `gpt-5` | 11 | 12 | 12 | 11 | 8 | 12 | 9 | 9 |
+| `z-ai/glm-5v-turbo` | 10 | 10 | 12 | 10 | 8 | 11 | 8 | 8 |
 | `o3` | 11 | 9 | 12 | 9 | 7 | 12 | 7 | 9 |
+| `deepseek/deepseek-v4-flash-vision-exp` | 3 | 5 | 6 | 6 | 2 | 11 | 8 | 10 |
 | `gpt-4o` | 7 | 6 | 5 | 7 | 4 | 7 | 3 | 2 |
+| `meta-llama/llama-4-maverick` | 6 | 7 | 5 | 4 | 4 | 7 | 5 | 3 |
 | `gpt-4.1` | 8 | 7 | 4 | 3 | 5 | 5 | 2 | 2 |
 | `gpt-4-turbo` | 7 | 8 | 3 | 4 | 5 | 4 | 2 | 1 |
 
@@ -145,10 +155,10 @@ Epilogue model spend: **$27.20** across 8 runs of 96 problems. Costs for runs ma
 
 ## Part 4 — Do the models fail on the same problems?
 
-Yes, decisively. Taking the 8 models that score 70% or better:
+Yes, decisively. Taking the 11 models that score 70% or better:
 
-- **64 of 96 problems** were solved by every one of them.
-- The **15 problems missed by two or more** account for **73% of all errors**.
+- **60 of 96 problems** were solved by every one of them.
+- The **23 problems missed by two or more** account for **86% of all errors**.
 - Error sets overlap about **4x more than independent errors would** (Jaccard 0.16 observed against 0.04 for random failures of the same size).
 - And when several models miss the same problem, **63% of them choose the same wrong option** — against roughly 14% for guessing.
 
@@ -158,14 +168,14 @@ Independent labs, different architectures, different training data, converging o
 
 | Problem | Correct | Missed by | Answers given | Agreement |
 |---|---|---|---|---|
-| `Challenge B-03` | 3 | 6/8 | 1 (5), 5 (1) | 83% on option 1 |
-| `Challenge B-04` | 4 | 5/8 | 5 (3), 1 (2) | 60% on option 5 |
-| `Challenge D-08` | 1 | 4/8 | 2 (3), 6 (1) | 75% on option 2 |
-| `Challenge E-08` | 7 | 4/8 | 5 (2), 3 (2) | 50% on option 5 |
-| `Challenge E-09` | 1 | 4/8 | 2 (2), 5 (1), 6 (1) | 50% on option 2 |
-| `Basic C-12` | 8 | 3/8 | 5 (1), 7 (1), 6 (1) | 33% on option 5 |
-| `Challenge B-02` | 1 | 3/8 | 5 (1), 3 (1), 4 (1) | 33% on option 5 |
-| `Challenge D-05` | 2 | 3/8 | 8 (2), 3 (1) | 67% on option 8 |
+| `Challenge B-03` | 3 | 9/11 | 1 (6), 5 (2), 2 (1) | 67% on option 1 |
+| `Challenge B-04` | 4 | 6/11 | 1 (3), 5 (3) | 50% on option 1 |
+| `Challenge D-08` | 1 | 5/11 | 2 (4), 6 (1) | 80% on option 2 |
+| `Challenge E-08` | 7 | 5/11 | 5 (3), 3 (2) | 60% on option 5 |
+| `Challenge E-09` | 1 | 5/11 | 6 (2), 2 (2), 5 (1) | 40% on option 6 |
+| `Challenge B-02` | 1 | 4/11 | 5 (2), 3 (1), 4 (1) | 50% on option 5 |
+| `Challenge D-05` | 2 | 4/11 | 8 (3), 3 (1) | 75% on option 8 |
+| `Basic B-07` | 6 | 3/11 | 5 (3) | 100% on option 5 |
 
 ### Why: two rules, and they only apply one
 
@@ -202,16 +212,24 @@ Yes, and by a lot. Every provider here sells an asynchronous batch tier: you upl
 | Model | Score | Tokens in / out | Standard | Batch | Saving |
 |---|---|---|---|---|---|
 | `anthropic/claude-fable-5` | 89/96 | 283,488 / 39,402 | $4.80 | $2.40 | 50% |
+| `deepseek/deepseek-v4-flash-vision-exp` | 51/96 | 231,648 / 432,617 | $0.34 | — | no batch tier |
 | `google/gemini-3.1-pro-preview` | 90/96 | 1,602,428 / 285,994 | $6.64 | $3.32 | 50% |
 | `google/gemini-3.7-flash` | 92/96 | 1,624,800 / 74,659 | $1.50 | $0.37 | 75% |
 | `gpt-4.1` | 36/96 | 454,896 / 5,435 | $0.95 | $0.48 | 50% |
 | `gpt-4-turbo` | 34/96 | 454,896 / 4,299 | $4.68 | $2.34 | 50% |
 | `gpt-4o` | 41/96 | 454,896 / 3,687 | $1.17 | $0.59 | 50% |
+| `meta-llama/llama-4-maverick` | 41/96 | 470,832 / 4,829 | $0.10 | — | no batch tier |
+| `moonshotai/kimi-k3` | 92/96 | 281,129 / 414,388 | $7.06 | $7.06 | 0% |
 | `o3` | 76/96 | 405,120 / 347,404 | $3.59 | $1.79 | 50% |
+| `qwen/qwen3.8-max` | 92/96 | 260,451 / 159,604 | $1.48 | — | no batch tier |
+| `x-ai/grok-4.6` | 92/96 | 229,416 / 574,014 | $3.90 | — | no batch tier |
+| `z-ai/glm-5v-turbo` | 77/96 | 274,680 / 262,712 | $1.38 | — | no batch tier |
 | `gpt-5.6-sol` | 93/96 | 243,912 / 29,504 | $0.78 | $0.39 | 50% |
 | `gpt-5.6-terra` | 89/96 | 243,912 / 44,419 | $1.02 | $0.51 | 50% |
 | `gpt-5` | 84/96 | 383,928 / 484,800 | $5.33 | $2.66 | 50% |
-| **total** | | | **$30.47** | **$14.86** | **51%** |
+| **total** | | | **$44.72** | **$29.11** | **35%** |
+
+No published batch variant: `deepseek/deepseek-v4-flash-vision-exp`, `meta-llama/llama-4-maverick`, `qwen/qwen3.8-max`, `x-ai/grok-4.6`, `z-ai/glm-5v-turbo`
 
 ### What you give up
 
@@ -230,13 +248,13 @@ Measured from the Claude Code session transcript, counting only the turns after 
 | | |
 |---|---|
 | Model doing the work | Claude Opus 5 (1M context) |
-| Assistant turns | 80 |
-| Tool calls | 39 (38 Bash, 1 Read) |
-| Output tokens | 150,470 |
-| Fresh input tokens | 160 |
-| Cache writes | 167,835 |
-| Cache reads | 31,931,894 |
-| Elapsed | 21 minutes |
+| Assistant turns | 364 |
+| Tool calls | 163 (144 Bash, 9 Read, 7 Monitor, 2 TaskStop, 1 ToolSearch) |
+| Output tokens | 487,221 |
+| Fresh input tokens | 728 |
+| Cache writes | 559,481 |
+| Cache reads | 180,883,309 |
+| Elapsed | 152 minutes |
 
 Regenerate with `python scripts/session_stats.py`; the figures move as the session continues.
 

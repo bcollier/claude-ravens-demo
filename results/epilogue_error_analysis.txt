@@ -1,33 +1,38 @@
-strong models (70%+): anthropic/claude-fable-5, google/gemini-3.1-pro-preview, google/gemini-3.7-flash, gpt-5, gpt-5.6-sol, gpt-5.6-terra, o3
+strong models (70%+): anthropic/claude-fable-5, google/gemini-3.1-pro-preview, google/gemini-3.7-flash, gpt-5, gpt-5.6-sol, gpt-5.6-terra, moonshotai/kimi-k3, o3, qwen/qwen3.8-max, x-ai/grok-4.6, z-ai/glm-5v-turbo
 
-Challenge Problem B-03       truth 3  missed 5/7  answers 1x4 5x1
-Challenge Problem D-08       truth 1  missed 4/7  answers 2x3 6x1
-Challenge Problem B-04       truth 4  missed 4/7  answers 5x2 1x2
-Challenge Problem E-08       truth 7  missed 4/7  answers 5x2 3x2
-Challenge Problem E-09       truth 1  missed 4/7  answers 2x2 5x1 6x1
-Challenge Problem D-05       truth 2  missed 3/7  answers 8x2 3x1
-Basic Problem C-12           truth 8  missed 3/7  answers 7x1 5x1 6x1
-Challenge Problem B-02       truth 1  missed 3/7  answers 5x1 3x1 4x1
-Basic Problem B-07           truth 6  missed 2/7  answers 5x2
-Challenge Problem B-06       truth 3  missed 2/7  answers 4x2
-Challenge Problem E-10       truth 1  missed 2/7  answers 2x2
-Basic Problem E-12           truth 6  missed 2/7  answers 7x1 4x1
-Challenge Problem B-07       truth 6  missed 2/7  answers 1x1 5x1
-Challenge Problem D-11       truth 5  missed 2/7  answers 6x1 2x1
-Basic Problem B-06           truth 5  missed 1/7  answers -1x1
-Basic Problem B-08           truth 6  missed 1/7  answers 2x1
-Basic Problem C-01           truth 3  missed 1/7  answers 1x1
-Basic Problem C-09           truth 2  missed 1/7  answers 8x1
-Basic Problem E-03           truth 2  missed 1/7  answers 1x1
-Basic Problem E-04           truth 8  missed 1/7  answers 4x1
-Basic Problem E-08           truth 1  missed 1/7  answers 2x1
-Challenge Problem B-01       truth 6  missed 1/7  answers 5x1
-Challenge Problem B-08       truth 4  missed 1/7  answers -1x1
-Challenge Problem B-10       truth 4  missed 1/7  answers 1x1
-Challenge Problem B-12       truth 1  missed 1/7  answers 4x1
-Challenge Problem D-02       truth 1  missed 1/7  answers 5x1
-Challenge Problem D-03       truth 1  missed 1/7  answers 6x1
-Challenge Problem D-04       truth 6  missed 1/7  answers 1x1
-Challenge Problem E-02       truth 7  missed 1/7  answers 3x1
-Challenge Problem E-03       truth 5  missed 1/7  answers 8x1
-Challenge Problem E-06       truth 7  missed 1/7  answers 1x1
+Challenge Problem B-03       truth 3  missed 9/11  answers 1x6 5x2 2x1
+Challenge Problem B-04       truth 4  missed 6/11  answers 5x3 1x3
+Challenge Problem D-08       truth 1  missed 5/11  answers 2x4 6x1
+Challenge Problem E-08       truth 7  missed 5/11  answers 5x3 3x2
+Challenge Problem E-09       truth 1  missed 5/11  answers 2x2 6x2 5x1
+Challenge Problem D-05       truth 2  missed 4/11  answers 8x3 3x1
+Challenge Problem B-02       truth 1  missed 4/11  answers 5x2 3x1 4x1
+Basic Problem B-07           truth 6  missed 3/11  answers 5x3
+Basic Problem C-09           truth 2  missed 3/11  answers 8x3
+Basic Problem E-04           truth 8  missed 3/11  answers -1x2 4x1
+Challenge Problem E-10       truth 1  missed 3/11  answers 2x2 6x1
+Basic Problem C-12           truth 8  missed 3/11  answers 7x1 5x1 6x1
+Basic Problem E-12           truth 6  missed 3/11  answers 7x1 5x1 4x1
+Challenge Problem D-11       truth 5  missed 3/11  answers 6x1 8x1 2x1
+Basic Problem E-03           truth 2  missed 2/11  answers 1x2
+Challenge Problem B-01       truth 6  missed 2/11  answers 5x2
+Challenge Problem B-06       truth 3  missed 2/11  answers 4x2
+Challenge Problem B-12       truth 1  missed 2/11  answers 4x2
+Challenge Problem E-02       truth 7  missed 2/11  answers 3x2
+Basic Problem B-05           truth 4  missed 2/11  answers -1x1 6x1
+Basic Problem C-08           truth 5  missed 2/11  answers 3x1 4x1
+Challenge Problem B-07       truth 6  missed 2/11  answers 1x1 5x1
+Challenge Problem E-06       truth 7  missed 2/11  answers 1x1 3x1
+Basic Problem B-06           truth 5  missed 1/11  answers -1x1
+Basic Problem B-08           truth 6  missed 1/11  answers 2x1
+Basic Problem B-12           truth 1  missed 1/11  answers 5x1
+Basic Problem C-01           truth 3  missed 1/11  answers 1x1
+Basic Problem E-08           truth 1  missed 1/11  answers 2x1
+Challenge Problem B-08       truth 4  missed 1/11  answers -1x1
+Challenge Problem B-10       truth 4  missed 1/11  answers 1x1
+Challenge Problem C-05       truth 4  missed 1/11  answers 2x1
+Challenge Problem D-01       truth 2  missed 1/11  answers 7x1
+Challenge Problem D-02       truth 1  missed 1/11  answers 5x1
+Challenge Problem D-03       truth 1  missed 1/11  answers 6x1
+Challenge Problem D-04       truth 6  missed 1/11  answers 1x1
+Challenge Problem E-03       truth 5  missed 1/11  answers 8x1

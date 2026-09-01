@@ -1,0 +1,12 @@
+model            : meta-llama/llama-4-maverick
+provider_route   : openrouter
+problems         : 96
+correct          : 41
+accuracy         : 0.4271
+wall_seconds     : 95.69
+workers          : 8
+cost_usd         : 0.0994
+unparseable      : 0
+input_tokens     : 470832
+output_tokens    : 4829
+reasoning_tokens : 0

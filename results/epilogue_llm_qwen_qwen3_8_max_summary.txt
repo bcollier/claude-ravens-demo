@@ -1,0 +1,12 @@
+model            : qwen/qwen3.8-max
+provider_route   : openrouter
+problems         : 96
+correct          : 92
+accuracy         : 0.9583
+wall_seconds     : 549.62
+workers          : 8
+cost_usd         : 1.4406
+unparseable      : 1
+input_tokens     : 260451
+output_tokens    : 159604
+reasoning_tokens : 152747

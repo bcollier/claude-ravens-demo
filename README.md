@@ -154,7 +154,7 @@ Correct, in 4.8 seconds. Note that it did not just produce a number — it descr
 
 ## 5. The results
 
-11 different language models from 4 companies were run on the identical 96 puzzles with the identical prompt. Alongside them, the two programs that run on a laptop with no internet.
+16 different language models from 9 companies were run on the identical 96 puzzles with the identical prompt. Alongside them, the two programs that run on a laptop with no internet.
 
 | | Score | Accuracy | Cost | Time | Needs internet |
 |---|---|---|---|---|---|
@@ -162,23 +162,30 @@ Correct, in 4.8 seconds. Note that it did not just produce a number — it descr
 | **Modern program, no language model** | 59/96 | 61% | $0 | 54 s | no |
 | `gpt-5.6-sol` *(used in class)* | 93/96 | 97% | $0.78 | 77 s | yes |
 | `google/gemini-3.7-flash` | 92/96 | 96% | $1.50 | 144 s | yes |
+| `moonshotai/kimi-k3` | 92/96 | 96% | $6.95 | 2157 s | yes |
+| `qwen/qwen3.8-max` | 92/96 | 96% | $1.44 | 550 s | yes |
 | `x-ai/grok-4.6` | 92/96 | 96% | $3.87 | 1794 s | yes |
 | `google/gemini-3.1-pro-preview` | 90/96 | 94% | $6.64 | 344 s | yes |
 | `anthropic/claude-fable-5` | 89/96 | 93% | $4.80 | 146 s | yes |
 | `gpt-5.6-terra` *(used in class)* | 89/96 | 93% | $1.02 | 193 s | yes |
 | `gpt-5` *(used in class)* | 84/96 | 88% | $5.33 | 1773 s | yes |
+| `z-ai/glm-5v-turbo` | 77/96 | 80% | $1.36 | 590 s | yes |
 | `o3` | 76/96 | 79% | $3.59 | 947 s | yes |
+| `deepseek/deepseek-v4-flash-vision-exp` | 51/96 | 53% | $0.53 | 582 s | yes |
 | `gpt-4o` | 41/96 | 43% | $1.17 | 36 s | yes |
+| `meta-llama/llama-4-maverick` | 41/96 | 43% | $0.10 | 96 s | yes |
 | `gpt-4.1` | 36/96 | 38% | $0.95 | 33 s | yes |
 | `gpt-4-turbo` | 34/96 | 35% | $4.68 | 101 s | yes |
 
 Costs are for all 96 puzzles. Times are for the whole sweep with ten requests running at once.
 
-### Three things worth noticing
+### What stands out
 
-**The price spread is far wider than the accuracy spread.** Among the top models a few percentage points of accuracy separate them, while the cost varies by roughly ten times. Picking the biggest, most expensive model is usually the wrong default — a newer cheap model routinely beats an older expensive one.
+**The price spread is far wider than the accuracy spread.** 4 different models from 4 companies tied on exactly 92/96 — and the cheapest of them cost $1.44 while the dearest cost $6.95, 4.8 times more for an identical score. Across the whole table the best model is also close to the cheapest. Picking the biggest, most expensive option is usually the wrong default.
 
 **Progress over two years is dramatic.** The same family of models went from the mid-thirties to the mid-nineties. For context, the mid-thirties is what the 2017 student program scores.
+
+**Being a language model is not enough on its own.** 5 of the 16 scored *below* the hand-written program with no AI in it at all — `deepseek/deepseek-v4-flash-vision-exp` at 51/96, `gpt-4o` at 41/96, `meta-llama/llama-4-maverick` at 41/96, `gpt-4.1` at 36/96, against 59/96. "We used AI" tells you almost nothing; which model, and how it was asked, is most of the outcome.
 
 **One model could not sit the test at all.** `gpt-3.5-turbo`, the model that made ChatGPT famous in 2022, cannot accept images. Not a low score — no score. The barrier is what it can perceive, not how well it reasons.
 
@@ -227,11 +234,11 @@ As a group the class was well calibrated. The median guess was 50 against a true
 
 This is the most useful section, because the failures are not random.
 
-Taking the 8 models that scored 70% or better:
+Taking the 11 models that scored 70% or better:
 
-- **64 of the 96 puzzles** were solved by every single one of them.
-- The **15 puzzles that two or more models missed** account for **73% of all the mistakes made**.
-- When several models miss the same puzzle, **about 63% of them choose the same wrong option** — against roughly 14% if they were guessing.
+- **60 of the 96 puzzles** were solved by every single one of them.
+- The **23 puzzles that two or more models missed** account for **86% of all the mistakes made**.
+- When several models miss the same puzzle, **about 68% of them choose the same wrong option** — against roughly 14% if they were guessing.
 
 Different companies, different technology, different training data, arriving at the same wrong answer. **The failures are a property of the puzzles, not of any one product.** If you are evaluating an AI tool for your own use, this is the pattern to look for: not "how often is it wrong" but "is it wrong in a predictable place".
 

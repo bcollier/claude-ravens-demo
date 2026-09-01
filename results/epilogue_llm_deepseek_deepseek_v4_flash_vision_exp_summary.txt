@@ -1,0 +1,12 @@
+model            : deepseek/deepseek-v4-flash-vision-exp
+provider_route   : openrouter
+problems         : 96
+correct          : 51
+accuracy         : 0.5312
+wall_seconds     : 582.17
+workers          : 8
+cost_usd         : 0.5319
+unparseable      : 0
+input_tokens     : 231648
+output_tokens    : 432617
+reasoning_tokens : 426595
