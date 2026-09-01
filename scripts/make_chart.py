@@ -88,3 +88,89 @@ def _recede(ax, axis):
     ax.grid(axis=axis, color=GRID, lw=0.8, zorder=0)
     ax.set_axisbelow(True)
     ax.tick_params(length=0, colors=INK_2)
+
+
+# --------------------------------------------------------------- timeline
+
+def openai_timeline(points, baselines, out_path):
+    """points: [(date, label, correct)] for one company, chronological.
+       baselines: [(label, correct)] drawn as reference lines."""
+    import datetime
+    import matplotlib.dates as mdates
+
+    fig, ax = plt.subplots(figsize=(10, 5.2), dpi=160)
+    fig.patch.set_facecolor(SURFACE)
+    ax.set_facecolor(SURFACE)
+
+    xs = [datetime.date.fromisoformat(d) for d, _, _ in points]
+    ys = [c for _, _, c in points]
+
+    for label, val in baselines:
+        ax.axhline(val, color=INK_2, lw=1, ls=(0, (4, 3)), zorder=2)
+        ax.text(xs[-1], val + 1.4, label, fontsize=9.5, color=INK_2, ha="right")
+
+    ax.plot(xs, ys, color=FAMILY_COLOR["llm"], lw=2, zorder=3,
+            marker="o", markersize=9, markerfacecolor=FAMILY_COLOR["llm"],
+            markeredgecolor=SURFACE, markeredgewidth=2)
+
+    # Place each label where it will not collide: a point that sits below its
+    # neighbours gets its label underneath, a peak gets it on top, and two
+    # models released the same day are forced apart.
+    seen = {}
+    for i, (x, (d, label, c)) in enumerate(zip(xs, points)):
+        nb = [ys[j] for j in (i - 1, i + 1) if 0 <= j < len(ys)]
+        above = c >= (sum(nb) / len(nb)) if nb else True
+        if seen.get(d):
+            above = False
+        ha = "center"
+        if i == 0:
+            ha = "left"
+        elif i == len(points) - 1:
+            ha = "right"
+        seen[d] = seen.get(d, 0) + 1
+        ax.annotate(f"{label}\n{c}/96 · {d}", (x, c), textcoords="offset points",
+                    xytext=(0, 15 if above else -36), ha=ha, fontsize=9,
+                    color=INK, linespacing=1.35)
+
+    ax.set_ylim(20, 108)
+    ax.set_yticks([34, 59, 96])
+    ax.set_yticklabels(["34", "59", "96"], fontsize=9, color=INK_2)
+    ax.set_ylabel("correct out of 96", fontsize=10, color=INK_2)
+    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
+    plt.setp(ax.get_xticklabels(), fontsize=9, color=INK_2, rotation=0)
+    ax.set_title("OpenAI models on the same 96 problems, by release date",
+                 fontsize=13.5, color=INK, loc="left", pad=14)
+    _recede(ax, axis="y")
+    ax.margins(x=0.09)
+
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    fig.savefig(out_path, facecolor=SURFACE, bbox_inches="tight", pad_inches=0.3)
+    plt.close(fig)
+    return out_path
+
+
+def build_timeline(company="openai"):
+    """Convenience entry point: the release-date timeline for one company."""
+    import glob
+    import model_dates
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    dates = model_dates.fetch()
+    pts = []
+    for path in sorted(glob.glob(os.path.join(root, "results", "*llm_*_summary.txt"))):
+        d = {l.split(":", 1)[0].strip(): l.split(":", 1)[1].strip() for l in open(path)}
+        model = d.get("model", "")
+        lab = model.split("/")[0] if "/" in model else "openai"
+        if lab != company:
+            continue
+        when = model_dates.date_for(model, dates)
+        if when:
+            pts.append((when, model.split("/")[-1], int(d["correct"])))
+    pts.sort()
+    return openai_timeline(
+        pts, [("hand-written program, no LLM  59", 59), ("2017 student project  34", 34)],
+        os.path.join(root, "docs", "openai_timeline.png"))
+
+
+if __name__ == "__main__":
+    print("wrote", build_timeline())

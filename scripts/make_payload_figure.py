@@ -108,10 +108,39 @@ def build():
 
     d.text((PAD, y), "One API call, one Raven's problem", font=f_h, fill=INK)
     y += 34
-    y = para(y, "Every block below is sent in a single request, in this order. "
-                "Nothing is pre-solved, cropped or described in words: the model gets "
-                "the same pictures a person would.", f_b, INK2)
-    y += 10
+    y = para(y, "Everything below goes in a single request, in this order. Nothing is "
+                "pre-solved, cropped or described in words: the model gets the same "
+                "pictures a person would.", f_b, INK2)
+    y += 14
+
+    # explicit inventory -- the question this figure exists to answer
+    n_img = sum(1 for b in content if b["type"] == "input_image")
+    n_txt = len(content) - n_img
+    inv_top = y
+    y += 12
+    d.text((PAD + 14, y), "IMAGE FILES ATTACHED TO THIS ONE REQUEST", font=f_lab, fill=ACCENT)
+    y += 24
+    for count, what, detail in [
+        ("1", "the assembled problem sheet",
+         "the whole puzzle in one picture, 1280x1024"),
+        ("8", "the matrix cells, one file each",
+         "Cell A .. Cell H, 184x184 each"),
+        ("8", "the answer options, one file each",
+         "Option 1 .. Option 8, 184x184 each"),
+    ]:
+        d.text((PAD + 14, y), count, font=font("Arial Bold.ttf", 19), fill=INK)
+        d.text((PAD + 48, y + 3), what, font=font("Arial Bold.ttf", 14), fill=INK)
+        d.text((PAD + 330, y + 4), detail, font=f_s, fill=INK2)
+        y += 26
+    d.line([(PAD + 14, y + 4), (PAD + 320, y + 4)], fill=RULE)
+    y += 12
+    d.text((PAD + 14, y), "17", font=font("Arial Bold.ttf", 19), fill=ACCENT)
+    d.text((PAD + 48, y + 3), "separate image files in total,", font=font("Arial Bold.ttf", 14), fill=ACCENT)
+    d.text((PAD + 262, y + 4), f"interleaved with {n_txt} short pieces of text",
+           font=f_s, fill=INK2)
+    y += 30
+    d.rectangle([PAD, inv_top, W - PAD, y], outline=ACCENT, width=1)
+    y += 22
     y = rule(y)
 
     # ---- system prompt
@@ -147,6 +176,11 @@ def build():
                     run.append((content[j]["text"].strip().rstrip(":"),
                                 decode(content[j + 1]["image_url"])))
                     j += 2
+                kind = run[0][0].split()[0]
+                d.text((PAD, y - 2),
+                       f"IMAGES {'2-9' if kind == 'Cell' else '10-17'} OF 17  ·  "
+                       f"{len(run)} SEPARATE FILES", font=f_lab, fill=ACCENT)
+                y += 18
                 x, thumb = PAD, 96
                 for name, im in run:
                     if x + thumb > W - PAD:
@@ -170,28 +204,15 @@ def build():
             canvas.paste(im.resize((wid, hei), Image.LANCZOS), (PAD, y))
             d.rectangle([PAD, y, PAD + wid, y + hei], outline=RULE)
             ax = PAD + wid + 26
-            d.text((ax, y + 2), "the assembled sheet", font=f_lab, fill=INK2)
-            d.text((ax, y + 20), f"{im.width} x {im.height} px", font=f_s, fill=INK2)
-            ty = y + 52
-            d.text((ax, ty), "SAME PAYLOAD, DIFFERENT BILL", font=f_lab, fill=ACCENT)
-            ty += 20
-            for line in wrap(d, "Every model below received exactly these 17 images. "
-                                "What each one counts as an image is entirely its own "
-                                "business:", f_s, W - PAD - ax):
-                d.text((ax, ty), line, font=f_s, fill=INK2)
-                ty += 16
-            ty += 8
-            for name, tok in measured_tokens():
-                d.text((ax, ty), name, font=f_s, fill=INK)
-                d.text((W - PAD, ty), f"{tok:,}", font=f_m, fill=INK, anchor="ra")
-                ty += 18
-            ty += 4
-            for line in wrap(d, "input tokens per problem. Token counts are not "
-                                "comparable across labs -- only dollars are.",
-                             f_s, W - PAD - ax):
-                d.text((ax, ty), line, font=f_s, fill=INK2)
-                ty += 16
-            y = max(y + hei, ty) + 16
+            d.text((ax, y + 2), "IMAGE 1 OF 17", font=f_lab, fill=ACCENT)
+            d.text((ax, y + 22), "the assembled problem sheet", font=f_b, fill=INK)
+            d.text((ax, y + 44), f"{im.width} x {im.height} pixels", font=f_s, fill=INK2)
+            for k, line in enumerate(wrap(d, "This one picture carries the layout: which "
+                                             "cells form a row, and which cell is "
+                                             "missing. The 16 files that follow carry "
+                                             "the detail.", f_s, W - PAD - ax)):
+                d.text((ax, y + 74 + k * 16), line, font=f_s, fill=INK2)
+            y += hei + 16
             i += 1
 
     y += 4
@@ -220,5 +241,45 @@ def build():
     return path
 
 
+def token_figure(out="llm_tokens.png"):
+    """Separate from the payload figure: identical files, very different bills."""
+    rows = measured_tokens()
+    Wt, H = 900, 150 + len(rows) * 20
+    c = Image.new("RGB", (Wt, H), PAPER)
+    d = ImageDraw.Draw(c)
+    f_h = font("Arial Bold.ttf", 19)
+    f_lab = font("Arial Bold.ttf", 13)
+    f_s = font("Arial.ttf", 13)
+    f_m = mono(12)
+
+    d.text((0, 8), "Same payload, very different bill", font=f_h, fill=INK)
+    y = 40
+    for line in wrap(d, "Every model below received exactly the same 17 image files. "
+                        "How many tokens each one charges for them is entirely its own "
+                        "business:", f_s, Wt):
+        d.text((0, y), line, font=f_s, fill=INK2)
+        y += 18
+    y += 12
+    lo, hi = rows[0][1], rows[-1][1]
+    for name, tok in rows:
+        frac = tok / hi
+        d.rectangle([250, y + 3, 250 + int(frac * 480), y + 13],
+                    fill=ACCENT if tok == hi or tok == lo else RULE)
+        d.text((0, y), name, font=f_s, fill=INK)
+        d.text((Wt, y), f"{tok:,}", font=f_m, fill=INK, anchor="ra")
+        y += 20
+    y += 10
+    d.text((0, y), f"input tokens per problem  ·  {hi/lo:.1f}x spread for identical files",
+           font=f_lab, fill=ACCENT)
+    y += 20
+    for line in wrap(d, "Token counts are not comparable between companies. Only "
+                        "dollars are.", f_s, Wt):
+        d.text((0, y), line, font=f_s, fill=INK2)
+        y += 18
+    c.crop((0, 0, Wt, y + 8)).save(os.path.join(ROOT, "docs", out))
+    print(f"wrote docs/{out}")
+
+
 if __name__ == "__main__":
     build()
+    token_figure()

@@ -6,8 +6,8 @@ Everything here is reproducible: every number in this document is generated from
 
 | | Score out of 96 | |
 |---|---|---|
-| The 2017 student project | **34** | 35% |
-| A modern program with no AI language model | **59** | 62% |
+| The 2017 student project, a hand-tuned scoring function | **34** | 35% |
+| A rule-based expert system with a learned ranker, no AI language model | **59** | 61% |
 | An AI language model (`gpt-5.6-sol`) | **93** | 97% |
 | Guessing at random | 13 | 13% |
 
@@ -49,6 +49,8 @@ The starting point was a real university assignment from eight years ago, writte
 
 ### What it does
 
+In the vocabulary of the course deck *Rules, Search and Expert Systems*, this is a **heuristic evaluation function**, not an expert system. There is no knowledge base of rules and no inference engine that searches through them. There is one fixed formula, applied identically to every puzzle.
+
 Its strategy is to turn each picture into a handful of numbers, then do arithmetic on them. The main number is simply **what percentage of the square is covered in black ink**. If ink coverage goes 10%, 20%, 30% along a row, the next one should be about 40%, so pick the option closest to that.
 
 It has six other measurements in the same spirit: how much ink two pictures share, where the ink sits on average, whether a picture is an exact repeat of another. Each measurement scores every option, the scores are combined using weights the author tuned by hand, and the highest total wins.
@@ -71,7 +73,21 @@ There is a nice footnote here. The code contains two genuine arithmetic mistakes
 
 The rule for this one was: solve the puzzles using any technique you like, except the sort of AI that has read the internet. So this program has to be *told* how to reason, in code.
 
-### The approach, and why
+### The approach, in course terms
+
+This one *is* an **expert system**, in the classical sense from the *Rules, Search and Expert Systems* material, with one modern addition:
+
+| Course concept | Where it appears here |
+|---|---|
+| **Knowledge representation** | A picture is not stored as pixels but decomposed into **frames** — slots and values: outer frame, inner shape, interior detail, object count, fill. `imageops.py` builds five such views of every panel. This is the same idea as the *semantic network* representation that ships with the original dataset. |
+| **Knowledge base** | About 300 candidate **if–then production rules** per puzzle: *if the third cell is the pixel union of the first two across every visible row, then the answer is the union of the last two.* |
+| **Search** | The rules define a **state space**, and the program searches it rather than applying one formula. This is generate-and-test: propose, then check. |
+| **Inference engine** | **Forward chaining** from what is visible to a conclusion: take the givens, apply each rule, see what it predicts. |
+| **Heuristics** | Each rule carries a confidence, and the confidences decide which conclusion wins. |
+
+The addition is where it stops being a textbook expert system. In a classical one, a human expert supplies both the rules **and** how much to trust each one. Here the rules are still hand-written, but **the trust is measured from data** — which is the hinge this whole project turns on, and the next two sections are about it.
+
+### Why this approach
 
 The 2017 program's limit was that it measured seven things and hoped one of them mattered. The obvious fix is to **propose a large number of possible rules and then work out which one is actually in force**. So this program generates roughly 300 candidate rules for every puzzle:
 
@@ -134,6 +150,12 @@ Reading down that picture: a sentence explaining the grid layout; then the **who
 
 Both views are sent deliberately. The full sheet shows the *structure* — which cells form a row, which one is missing — but any single cell inside it is too small to compare shapes reliably. The individual pictures give the detail but lose all sense of position. Neither on its own is enough.
 
+### The same files cost wildly different amounts
+
+![Input tokens per problem, by model](docs/llm_tokens.png)
+
+Every model received exactly those 17 files. A **token** is the unit these companies bill in — roughly a chunk of text, or a patch of an image — and each company chops pictures up differently. The same puzzle costs `gpt-5.6-sol` about 2,500 tokens and `gemini-3.1-pro` about 17,000. **Compare vendors on money, never on tokens.**
+
 The model is also given a short instruction listing the kinds of rule these puzzles use — 134 words, quoted in full in [03_llm/README.md](03_llm/README.md). That is the only help it gets. **No worked examples, no second attempts, no conversation, and no hints about which set a puzzle came from.** One request, one answer, and whatever comes back is the score.
 
 ### Exactly what comes back
@@ -156,28 +178,34 @@ Correct, in 4.8 seconds. Note that it did not just produce a number — it descr
 
 16 different language models from 9 companies were run on the identical 96 puzzles with the identical prompt. Alongside them, the two programs that run on a laptop with no internet.
 
-| | Score | Accuracy | Cost | Time | Needs internet |
-|---|---|---|---|---|---|
-| **2017 student project** | 34/96 | 35% | $0 | 34 s | no |
-| **Modern program, no language model** | 59/96 | 61% | $0 | 54 s | no |
-| `gpt-5.6-sol` *(used in class)* | 93/96 | 97% | $0.78 | 77 s | yes |
-| `google/gemini-3.7-flash` | 92/96 | 96% | $1.50 | 144 s | yes |
-| `moonshotai/kimi-k3` | 92/96 | 96% | $6.95 | 2157 s | yes |
-| `qwen/qwen3.8-max` | 92/96 | 96% | $1.44 | 550 s | yes |
-| `x-ai/grok-4.6` | 92/96 | 96% | $3.87 | 1794 s | yes |
-| `google/gemini-3.1-pro-preview` | 90/96 | 94% | $6.64 | 344 s | yes |
-| `anthropic/claude-fable-5` | 89/96 | 93% | $4.80 | 146 s | yes |
-| `gpt-5.6-terra` *(used in class)* | 89/96 | 93% | $1.02 | 193 s | yes |
-| `gpt-5` *(used in class)* | 84/96 | 88% | $5.33 | 1773 s | yes |
-| `z-ai/glm-5v-turbo` | 77/96 | 80% | $1.36 | 590 s | yes |
-| `o3` | 76/96 | 79% | $3.59 | 947 s | yes |
-| `deepseek/deepseek-v4-flash-vision-exp` | 51/96 | 53% | $0.53 | 582 s | yes |
-| `gpt-4o` | 41/96 | 43% | $1.17 | 36 s | yes |
-| `meta-llama/llama-4-maverick` | 41/96 | 43% | $0.10 | 96 s | yes |
-| `gpt-4.1` | 36/96 | 38% | $0.95 | 33 s | yes |
-| `gpt-4-turbo` | 34/96 | 35% | $4.68 | 101 s | yes |
+| | Released | Score | Accuracy | Cost | Time | Needs internet |
+|---|---|---|---|---|---|---|
+| **2017 student project** | 2017 | 34/96 | 35% | $0 | 34 s | no |
+| **Rule-based expert system + learned ranker** | 2026 | 59/96 | 61% | $0 | 54 s | no |
+| `gpt-5.6-sol` *(used in class)*<br>**🏆 most accurate** | 2026-07-09 | 93/96 | 97% | $0.78 | 77 s | yes |
+| `google/gemini-3.7-flash` | 2026-08-13 | 92/96 | 96% | $1.50 | 144 s | yes |
+| `moonshotai/kimi-k3`<br>**💸 most expensive** · **🐌 slowest** | 2026-07-16 | 92/96 | 96% | $6.95 | 2157 s | yes |
+| `qwen/qwen3.8-max` | 2026-08-03 | 92/96 | 96% | $1.44 | 550 s | yes |
+| `x-ai/grok-4.6` | 2026-08-12 | 92/96 | 96% | $3.87 | 1794 s | yes |
+| `google/gemini-3.1-pro-preview` | 2026-02-19 | 90/96 | 94% | $6.64 | 344 s | yes |
+| `anthropic/claude-fable-5` | 2026-06-09 | 89/96 | 93% | $4.80 | 146 s | yes |
+| `gpt-5.6-terra` *(used in class)* | 2026-07-09 | 89/96 | 93% | $1.02 | 193 s | yes |
+| `gpt-5` *(used in class)* | 2025-08-07 | 84/96 | 88% | $5.33 | 1773 s | yes |
+| `z-ai/glm-5v-turbo` | 2026-04-01 | 77/96 | 80% | $1.36 | 590 s | yes |
+| `o3` | 2025-04-16 | 76/96 | 79% | $3.59 | 947 s | yes |
+| `deepseek/deepseek-v4-flash-vision-exp` | 2026-08-21 | 51/96 | 53% | $0.53 | 582 s | yes |
+| `gpt-4o` | 2024-05-12 | 41/96 | 43% | $1.17 | 36 s | yes |
+| `meta-llama/llama-4-maverick` | 2025-04-05 | 41/96 | 43% | $0.10 | 96 s | yes |
+| `gpt-4.1` | 2025-04-14 | 36/96 | 38% | $0.95 | 33 s | yes |
+| `gpt-4-turbo` | 2024-04-08 | 34/96 | 35% | $4.68 | 101 s | yes |
 
-Costs are for all 96 puzzles. Times are for the whole sweep with ten requests running at once.
+Costs are for all 96 puzzles. Times are for the whole sweep with ten requests running at once. Release dates are the date each model was first publicly listed.
+
+### The same company, over two and a half years
+
+![OpenAI models on the same 96 problems, by release date](docs/openai_timeline.png)
+
+Two models released **two days apart** sit on opposite sides of the line. `gpt-4.1` scored 36 and `o3` scored 76 — because `o3` was the first of these designed to spend time working through a problem step by step before answering, rather than responding immediately. That single design change matters more here than the two years of scaling around it.
 
 ### What stands out
 
@@ -230,7 +258,38 @@ As a group the class was well calibrated. The median guess was 50 against a true
 
 ---
 
-## 7. Where the AI still fails
+## 7. What the whole experiment cost
+
+**Total spend on AI models: $44.72.** That is every one of the 16 models answering all 96 puzzles, 1,536 questions in total. The two programs that run on a laptop cost nothing but about 90 seconds of electricity between them.
+
+| | Cost |
+|---|---|
+| The three models used live in class | $7.13 |
+| The 13 models added afterwards | $37.59 |
+| Both programs that need no internet | $0.00 |
+| **Everything** | **$44.72** |
+
+Running the same sweep in batch mode would have cost roughly half — see [EPILOGUE.md](EPILOGUE.md).
+
+### And what the AI that wrote the code used
+
+All of this — the two programs, the neural network, the evaluation harness, every figure and every document — was written by Claude Opus 5 driving a terminal. That work has its own token bill, measured from the session transcript:
+
+| | In class | Added afterwards | Total |
+|---|---|---|---|
+| Output tokens (code written, plus private reasoning) | 577,367 | 554,580 | 1,131,947 |
+| Fresh input tokens | 704 | 838 | 1,542 |
+| Cache writes | 1,197,457 | 676,805 | 1,874,262 |
+| Cache reads | 71,346,454 | 216,751,308 | 288,097,762 |
+| Assistant turns | 352 | 419 | 771 |
+
+Two things stand out. **Cache reads dwarf everything else** — nearly every token the model read was a re-read of the same growing conversation, which is what makes a session this long affordable at all. And **output tokens dwarf the visible chat by around fifty times**: almost everything produced was source code and private reasoning, not words on a screen.
+
+Figures are a snapshot taken while the session was still running; re-run `python scripts/session_stats.py` for current ones.
+
+---
+
+## 8. Where the AI still fails
 
 This is the most useful section, because the failures are not random.
 
@@ -278,7 +337,25 @@ Every model was asked to rate its own confidence. The best one reported **0.99 o
 
 ---
 
-## 8. What to take from this
+## 9. How is the language model doing this at all?
+
+Nobody wrote a Raven's solver inside it. It is worth understanding roughly what it *is* doing, because the mistakes in the previous section follow directly from the mechanism.
+
+**Everything becomes numbers.** The pictures are cut into small square patches — think of a grid laid over each image — and every patch is turned into a list of a few thousand numbers called an [embedding](https://en.wikipedia.org/wiki/Word_embedding). An embedding is a position in a very high-dimensional space where similar things land near each other: two pictures of an octagon end up close together, an octagon and a circle a little further apart, an octagon and the word "octagon" also close by, because the model was trained on pictures and text together. The words in the prompt are turned into embeddings the same way. After this step there is no difference between an image and a sentence — both are just long lists of numbers in the same space.
+
+**The model looks for relationships between them.** The architecture is a [transformer](https://jalammar.github.io/illustrated-transformer/), and for images specifically a [vision transformer](https://en.wikipedia.org/wiki/Vision_transformer). Its central operation, [attention](https://en.wikipedia.org/wiki/Attention_(machine_learning)), lets every patch of every image look at every other patch and at every word, and decide which ones are relevant to it. That is why sending the panels separately and labelled helps: it lets the model attend to "Cell A" as a unit and compare it against "Option 3" directly.
+
+**It predicts the next chunk of text, over and over.** That is the only thing it was ever trained to do — on an enormous amount of text and images, guess what comes next. Everything else, including the reasoning, is a side effect of getting extremely good at that. When it writes *"the outer shapes cycle through three states in each row"*, it is not consulting a stored rule about Raven's matrices; it is producing the words that best continue the prompt, and for a model of this size those words tend to be true ones.
+
+**The newer ones think before answering.** The jump in the chart above between `gpt-4.1` and `o3` is [chain-of-thought reasoning](https://arxiv.org/abs/2201.11903): the model writes out a long private working-out, which you are not shown and which you pay for as output tokens, before committing to an answer. `gpt-5` spent about 475,000 such hidden tokens across these 96 puzzles. It is, quite literally, the difference between answering off the top of your head and working it through on paper.
+
+**Which explains the failures.** Section 7's two errors are exactly what this mechanism predicts. Attention is drawn to what is salient, so a dramatic visual change (bands filling in black) crowds out a quiet one (rings being removed). And there is no scratchpad with guaranteed arithmetic — tracking three constraints at once through a sudoku is done in the same next-word machinery as everything else, and it slips. **The model is doing sophisticated pattern completion, not symbolic verification.** For the verification step, ordinary software is still better.
+
+If you want to go deeper: the [original transformer paper](https://arxiv.org/abs/1706.03762) (2017) and the [vision transformer paper](https://arxiv.org/abs/2010.11929) (2020) are the two that got us here, and OpenAI's [tokenizer](https://platform.openai.com/tokenizer) lets you see text being chopped into billable units.
+
+---
+
+## 10. What to take from this
 
 **Old software is more durable than you think.** Eight-year-old code ran untouched. The expensive part of software is rarely keeping it alive; it is that its original design decides its ceiling.
 
@@ -294,7 +371,7 @@ Every model was asked to rate its own confidence. The best one reported **0.99 o
 
 ---
 
-## 9. Technical notes
+## 11. Technical notes
 
 *For readers who want to run or extend this. Everything below is optional.*
 

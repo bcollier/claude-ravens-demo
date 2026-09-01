@@ -248,13 +248,13 @@ Measured from the Claude Code session transcript, counting only the turns after 
 | | |
 |---|---|
 | Model doing the work | Claude Opus 5 (1M context) |
-| Assistant turns | 364 |
-| Tool calls | 163 (144 Bash, 9 Read, 7 Monitor, 2 TaskStop, 1 ToolSearch) |
-| Output tokens | 487,221 |
-| Fresh input tokens | 728 |
-| Cache writes | 559,481 |
-| Cache reads | 180,883,309 |
-| Elapsed | 152 minutes |
+| Assistant turns | 419 |
+| Tool calls | 191 (166 Bash, 14 Read, 7 Monitor, 2 TaskStop, 1 Artifact, 1 ToolSearch) |
+| Output tokens | 554,580 |
+| Fresh input tokens | 838 |
+| Cache writes | 676,805 |
+| Cache reads | 216,751,308 |
+| Elapsed | 214 minutes |
 
 Regenerate with `python scripts/session_stats.py`; the figures move as the session continues.
 
