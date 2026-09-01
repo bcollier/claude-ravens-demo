@@ -142,37 +142,54 @@ def main():
           f"{float(rn.get('train_seconds',0)):.0f} seconds.\n")
 
     w("### Results\n")
-    w("| Model | What it is | Real 96 | Notes |")
+    w("Three versions of the *same network and the same training budget*. Only the "
+      "generator changed.\n")
+    w("| | Training data | Held-out synthetic | **Real 96** |")
     w("|---|---|---|---|")
-    if rn:
-        w(f"| **D1 relation network** | CNN + pairwise relation head, trained only on "
-          f"synthetic matrices | **{rn.get('correct','?')}/96** "
-          f"({float(rn.get('accuracy',0)):.1%}) | "
-          f"{float(rn.get('synthetic_val',0)):.0%} on held-out *synthetic* problems |")
-    if rn_v1:
-        w(f"| D1a ablation | the same network, trained on a generator that varies every "
-          f"attribute at once | {rn_v1.get('correct','?')}/96 "
-          f"({float(rn_v1.get('accuracy',0)):.1%}) | "
-          f"{float(rn_v1.get('synthetic_val',0)):.0%} synthetic |")
-    for kind, label in [("mlp", "**D2 neural ranker** | an MLP scoring each option from the "
-                                "symbolic rule features, instead of the linear ranker"),
-                        ("hybrid", "**D3 hybrid** | D2's features plus the relation "
-                                   "network's score for each option")]:
+    variants = [
+        ("v1", "epilogue_neural_v1_all_attributes_summary.txt",
+         "every attribute given its own rule at once"),
+        ("v2", "epilogue_neural_v2_simple_panels_summary.txt",
+         "one or two active attributes, single repeated shapes"),
+        ("v3", "epilogue_neural_relationnet_summary.txt",
+         "as v2, plus composed panels: nested frames, inner shapes, bars"),
+    ]
+    for tag, fn, desc in variants:
+        d = read_summary(os.path.join(RESULTS, fn))
+        if not d:
+            continue
+        bold = "**" if tag == "v3" else ""
+        w(f"| {tag} | {desc} | {float(d.get('synthetic_val',0)):.0%} | "
+          f"{bold}{d.get('correct','?')}/96 ({float(d.get('accuracy',0)):.1%}){bold} |")
+    w("")
+    w("And the two rankers that use the symbolic features, on the 70/30 protocol from "
+      "Part 2 so they are directly comparable:\n")
+    w("| Ranker | Features | 70/30 test accuracy |")
+    w("|---|---|---|")
+    rows = [("linear (in class)", "48 symbolic rule features", "linear"),
+            ("**MLP**", "the same 48 features, a small neural network", "mlp"),
+            ("**hybrid**", "those 48 plus the relation network's score per option", "hybrid")]
+    for label, feats, kind in rows:
         if kind in split:
             d = split[kind]
-            w(f"| {label} | {d['mean']:.1%} ± {d['std']:.1%} | 70/30 split, "
-              f"{d['seeds']} seeds |")
-    if "linear" in split:
-        d = split["linear"]
-        w(f"| *(for reference)* the in-class linear ranker | classical features, "
-          f"logistic pairwise ranker | {d['mean']:.1%} ± {d['std']:.1%} | same 70/30 "
-          f"protocol |")
+            w(f"| {label} | {feats} | {d['mean']:.1%} ± {d['std']:.1%} |")
     w("")
     w("### What this shows\n")
-    w("**The training distribution mattered more than the architecture.** The first "
-      "generator gave every attribute its own rule simultaneously, producing matrices "
-      "that are visually chaotic in a way real Raven's problems never are. Same "
-      "network, same budget, same code — only the data changed.\n")
+    w("**The training distribution moved the numbers; the architecture never did.** "
+      "Every row above is the same network with the same budget. v1's generator gave "
+      "every attribute its own rule at once, producing matrices that are visually "
+      "chaotic in a way real Raven's problems never are. v2 fixed that and learned the "
+      "synthetic task far better. v3 added the composed panels — nested frames, inner "
+      "shapes, bars — that sets D and E are actually built from.\n")
+    w("**Learning the synthetic task better did not mean solving the real one better.** "
+      "That is the sharpest lesson here. v2 roughly doubled held-out synthetic accuracy "
+      "over v1 and did *worse* on the real problems. A network can only learn the world "
+      "you show it, and the gap between that world and the real one does not appear "
+      "anywhere in the training metrics.\n")
+    w("A diagnostic worth copying: blanking every context panel and re-scoring drops "
+      "the network to chance on synthetic problems. So it genuinely reads the matrix "
+      "rather than exploiting a giveaway in how the distractors were made — the failure "
+      "on real problems is domain gap, not a shortcut.\n")
     w("**A network trained on synthetic data does not reach the symbolic agent.** That "
       "is the honest result and it is worth sitting with: the relation network has to "
       "*discover* concepts like \"the outer frame is unchanged\" from pixels, with only "

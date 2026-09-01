@@ -100,11 +100,16 @@ def parse_answer(text, n_choices):
 
 
 # Older and reasoning-family models disagree about the token-limit parameter.
+# The limit has to cover reasoning tokens too: at 8,000 a reasoning model can
+# burn the whole budget thinking and return an empty message. 32,000 matches
+# what the in-class runs gave gpt-5.x, so the comparison stays fair. Models that
+# cannot accept it are stepped down automatically from the API's error.
+DEFAULT_MAX_TOKENS = 32000
 TOKEN_PARAM = {}          # model -> ("max_tokens" | "max_completion_tokens", limit)
 
 
 def ask(client, model, problem, retries=4, route="openrouter"):
-    param, limit = TOKEN_PARAM.get(model, ("max_tokens", 8000))
+    param, limit = TOKEN_PARAM.get(model, ("max_tokens", DEFAULT_MAX_TOKENS))
     extra = {"usage": {"include": True}} if route == "openrouter" else {}
     for attempt in range(retries):
         body = dict(model=model, messages=build_messages(problem), **{param: limit})
@@ -122,7 +127,10 @@ def ask(client, model, problem, retries=4, route="openrouter"):
                     "in_tokens": int(getattr(u, "prompt_tokens", 0) or 0),
                     "out_tokens": int(getattr(u, "completion_tokens", 0) or 0),
                     "reasoning_tokens": reasoning, "cost": cost,
-                    "error": "" if ans > 0 else "unparseable: " + text[:120].replace("\n", " ")}
+                    "error": "" if ans > 0 else
+                             (f"truncated at {u.completion_tokens} output tokens"
+                              if not text and getattr(u, "completion_tokens", 0) >= limit
+                              else "unparseable: " + text[:120].replace("\n", " "))}
         except Exception as exc:
             msg = str(exc)
             if "max_completion_tokens" in msg and param == "max_tokens":

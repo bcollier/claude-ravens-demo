@@ -20,15 +20,27 @@ You cannot train a network on 96 examples. The standard way round it, and what t
 
 ### Results
 
-| Model | What it is | Real 96 | Notes |
+Three versions of the *same network and the same training budget*. Only the generator changed.
+
+| | Training data | Held-out synthetic | **Real 96** |
 |---|---|---|---|
-| D1a ablation | the same network, trained on a generator that varies every attribute at once | 15/96 (15.6%) | 29% synthetic |
-| **D2 neural ranker** | an MLP scoring each option from the symbolic rule features, instead of the linear ranker | 62.1% ± 5.6% | 70/30 split, 3 seeds |
-| *(for reference)* the in-class linear ranker | classical features, logistic pairwise ranker | 65.5% ± 5.6% | same 70/30 protocol |
+| v1 | every attribute given its own rule at once | 29% | 15/96 (15.6%) |
+| v2 | one or two active attributes, single repeated shapes | 59% | 10/96 (10.4%) |
+
+And the two rankers that use the symbolic features, on the 70/30 protocol from Part 2 so they are directly comparable:
+
+| Ranker | Features | 70/30 test accuracy |
+|---|---|---|
+| linear (in class) | 48 symbolic rule features | 65.5% ± 5.6% |
+| **MLP** | the same 48 features, a small neural network | 62.1% ± 5.6% |
 
 ### What this shows
 
-**The training distribution mattered more than the architecture.** The first generator gave every attribute its own rule simultaneously, producing matrices that are visually chaotic in a way real Raven's problems never are. Same network, same budget, same code — only the data changed.
+**The training distribution moved the numbers; the architecture never did.** Every row above is the same network with the same budget. v1's generator gave every attribute its own rule at once, producing matrices that are visually chaotic in a way real Raven's problems never are. v2 fixed that and learned the synthetic task far better. v3 added the composed panels — nested frames, inner shapes, bars — that sets D and E are actually built from.
+
+**Learning the synthetic task better did not mean solving the real one better.** That is the sharpest lesson here. v2 roughly doubled held-out synthetic accuracy over v1 and did *worse* on the real problems. A network can only learn the world you show it, and the gap between that world and the real one does not appear anywhere in the training metrics.
+
+A diagnostic worth copying: blanking every context panel and re-scoring drops the network to chance on synthetic problems. So it genuinely reads the matrix rather than exploiting a giveaway in how the distractors were made — the failure on real problems is domain gap, not a shortcut.
 
 **A network trained on synthetic data does not reach the symbolic agent.** That is the honest result and it is worth sitting with: the relation network has to *discover* concepts like "the outer frame is unchanged" from pixels, with only the rules I thought to put in the generator to learn from. The symbolic agent was handed those concepts. When you have 96 problems and strong priors about the domain, encoding the priors beats learning them.
 
@@ -71,10 +83,9 @@ Identical inputs, identical prompt, one call per problem. Only the model changes
 | `gpt-4o` | OpenAI | 41/96 | **42.7%** | $1.17 | $0.03 | 36 s | 454,896 | 3,687 | no |
 | `gpt-4.1` | OpenAI | 36/96 | **37.5%** | $0.95 | $0.03 | 33 s | 454,896 | 5,435 | no |
 | `gpt-4-turbo` | OpenAI | 34/96 | **35.4%** | $4.68 | $0.14 | 101 s | 454,896 | 4,299 | no |
-| `meta-llama/llama-4-maverick` | Meta | 0/96 | **0.0%** | $0.0000 | — | 215 s | 0 | 0 | no |
 | `o3` | OpenAI | 0/96 | **0.0%** | $0.0000 | — | 120 s | 0 | 0 | no |
 
-Epilogue model spend: **$6.81** across 5 runs of 96 problems.
+Epilogue model spend: **$6.81** across 4 runs of 96 problems.
 
 ### By problem set
 
@@ -86,7 +97,6 @@ Epilogue model spend: **$6.81** across 5 runs of 96 problems.
 | `gpt-4o` | 7 | 6 | 5 | 7 | 4 | 7 | 3 | 2 |
 | `gpt-4.1` | 8 | 7 | 4 | 3 | 5 | 5 | 2 | 2 |
 | `gpt-4-turbo` | 7 | 8 | 3 | 4 | 5 | 4 | 2 | 1 |
-| `meta-llama/llama-4-maverick` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | `o3` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 ### GPT-3.5 could not take the test

@@ -762,6 +762,65 @@ def build():
             w(f'<tr><td>{name}</td><td class="n">{thousands(ln)}</td><td>{note}</td></tr>')
         w("</tbody></table></div></section>")
 
+    # ---------------------------------------------------------- epilogue
+    epi_path = os.path.join(ROOT, "results", "epilogue_split_eval.json")
+    rn_path = os.path.join(ROOT, "results", "epilogue_neural_relationnet_summary.txt")
+    rn_v1 = os.path.join(ROOT, "results", "epilogue_neural_v1_all_attributes_summary.txt")
+    if os.path.exists(epi_path) or os.path.exists(rn_path):
+        def summ(path):
+            d = {}
+            if os.path.exists(path):
+                for line in open(path):
+                    k, _, v = line.partition(":")
+                    d[k.strip()] = v.strip()
+            return d
+        rn, rnv1 = summ(rn_path), summ(rn_v1)
+        sp = json.load(open(epi_path)) if os.path.exists(epi_path) else {}
+
+        w('<section><div class="sec-head"><span class="lab">Epilogue &mdash; added after class</span>'
+          "<h2>Three things the session did not settle</h2></div>")
+        w('<p>Everything above ran live and is untouched. These were added afterwards, '
+          'and the full write-up is in <code>EPILOGUE.md</code>.</p>')
+        w('<div class="three">')
+        if rn:
+            w('<div class="cell stack"><span class="cell-tag">1</span>'
+              "<h3>A neural network, still no LLM</h3>"
+              f'<div class="num" style="font-size:40px">{rn.get("correct","?")}'
+              f'<span class="den">/96</span></div>'
+              "<p style=\"margin:6px 0 0\">A relation network (CNN + a shared MLP over "
+              "every pair of panels) trained only on synthetic matrices, so the real 96 "
+              "stay a genuine held-out test. It does not reach the symbolic agent: with "
+              "96 problems and strong domain priors, encoding the priors beats learning "
+              "them.</p>"
+              + (f'<p style="margin:0;font-size:15px;color:var(--ink-2)">Fixing the '
+                 f'<em>generator</em> so it varies one or two attributes at a time, the '
+                 f'way real matrices do, moved held-out synthetic accuracy from '
+                 f'{float(rnv1.get("synthetic_val",0)):.0%} to '
+                 f'{float(rn.get("synthetic_val",0)):.0%}. The training distribution was '
+                 f'the bottleneck, not the architecture.</p>' if rnv1 and rn else "")
+              + "</div>")
+        if sp.get("linear"):
+            d = sp["linear"]
+            w('<div class="cell stack"><span class="cell-tag">2</span>'
+              "<h3>A plain 70/30 split</h3>"
+              f'<div class="num" style="font-size:40px">{d["mean"]:.0%}</div>'
+              f'<p style="margin:6px 0 0">Stratified, {d["train_n"]} train / '
+              f'{d["test_n"]} test, over {d["seeds"]} seeds. <em>Higher</em> than the '
+              "leave-one-set-out number above, because a random split lets the model see "
+              "every problem family during training. The gap between the two is how much "
+              "the agent depends on having met that kind of puzzle before.</p>"
+              '<p style="margin:0;font-size:15px;color:var(--s2)">The model weights were '
+              "always held out. The <em>feature design</em> was not: set D's failures "
+              "were inspected and rule families added because of them. No re-split fixes "
+              "that.</p></div>")
+        w('<div class="cell stack"><span class="cell-tag">3</span>'
+          "<h3>Other labs</h3>"
+          "<p style=\"margin:6px 0 0\">The in-class runs were all OpenAI. The epilogue "
+          "adds one flagship vision model per lab on the identical prompt, with the "
+          "dollar cost of every run. GPT-3.5 cannot be entered at all &mdash; it has no "
+          "image input, so the barrier is modality, not reasoning.</p></div>")
+        w("</div></section>")
+
     # ---------------------------------------------------------- method
     w('<section><div class="sec-head"><span class="lab">Method</span>'
       "<h2>How to read these numbers</h2></div><div class=\"two\">")

@@ -34,6 +34,12 @@ SCALES = [0.34, 0.48, 0.62, 0.78]
 ANGLES = [0, 30, 45, 60, 90, 135]
 FILLS = [0, 1]
 COUNTS = [1, 2, 3, 4]
+# Real sets D and E are built from *composed* panels: an outer frame holding an
+# inner shape, or a shape with bars drawn across it. Without these the synthetic
+# world is far narrower than the real one and the network does not transfer.
+INNERS = ["none", "circle", "square", "triangle", "star", "plus", "heart", "diamond"]
+BARS = ["none", "v", "h", "cross"]
+FRAMES = [1, 2, 3]
 
 # 3x3 grid positions inside a 3x3 layout; 2x2 uses the top-left quadrant.
 POS_3X3 = list(range(9))
@@ -105,6 +111,47 @@ LAYOUTS = {1: [(0.5, 0.5)],
            4: [(0.32, 0.32), (0.68, 0.32), (0.32, 0.68), (0.68, 0.68)]}
 
 
+def _mask_of(draw_fn, filled=True):
+    im = Image.new("L", (SIZE, SIZE), 255)
+    draw_fn(ImageDraw.Draw(im))
+    return np.array(im) < 128
+
+
+def render_composed(attrs, jitter=0.0, width=3) -> np.ndarray:
+    """A panel made of an outer frame (possibly nested), optional bars drawn
+    across it, and an optional inner shape -- the structure sets D and E use."""
+    jx = random.uniform(-jitter, jitter) * SIZE
+    jy = random.uniform(-jitter, jitter) * SIZE
+    cx, cy = SIZE / 2 + jx, SIZE / 2 + jy
+    R = attrs["scale"] * SIZE * 0.5
+
+    outer_fill = attrs["fill"] and attrs["inner"] == "none" and attrs["bars"] == "none"
+    ink = np.zeros((SIZE, SIZE), dtype=bool)
+    for k in range(attrs["frames"]):
+        rr = R * (1.0 - 0.18 * k)
+        ink |= _mask_of(lambda d, rr=rr: draw_shape(
+            d, attrs["shape"], cx, cy, rr, outer_fill, attrs["angle"], width))
+
+    silhouette = _mask_of(lambda d: draw_shape(
+        d, attrs["shape"], cx, cy, R, True, attrs["angle"], width))
+
+    if attrs["bars"] != "none":
+        t = max(4, int(R * 0.16))
+        def bars(d):
+            if attrs["bars"] in ("v", "cross"):
+                d.rectangle([cx - t, 0, cx + t, SIZE], fill=0)
+            if attrs["bars"] in ("h", "cross"):
+                d.rectangle([0, cy - t, SIZE, cy + t], fill=0)
+        ink |= (_mask_of(bars) & silhouette)
+
+    if attrs["inner"] != "none":
+        ink |= _mask_of(lambda d: draw_shape(
+            d, attrs["inner"], cx, cy, R * 0.34, attrs["fill"], attrs["angle"], width))
+
+    out = np.where(ink, 0, 255).astype(np.uint8)
+    return np.array(Image.fromarray(out).resize((OUT, OUT), Image.BILINEAR))
+
+
 def render(attrs, jitter=0.0, width=3) -> np.ndarray:
     """attrs: dict(shape, scale, fill, angle, count) -> uint8 panel, 0=ink.
 
@@ -112,6 +159,10 @@ def render(attrs, jitter=0.0, width=3) -> np.ndarray:
     in stroke weight and centring, so training panels do too -- without it the
     network latches onto the exact pixel geometry of the synthetic renderer and
     transfers worse."""
+    if attrs.get("count", 1) == 1 and (attrs.get("inner", "none") != "none"
+                                       or attrs.get("bars", "none") != "none"
+                                       or attrs.get("frames", 1) > 1):
+        return render_composed(attrs, jitter, width)
     im = Image.new("L", (SIZE, SIZE), 255)
     d = ImageDraw.Draw(im)
     n = attrs["count"]
@@ -132,8 +183,9 @@ def blank():
 
 # ------------------------------------------------------------------ rules
 
-ATTRS = ["shape", "scale", "fill", "angle", "count"]
-DOMAIN = {"shape": SHAPES, "scale": SCALES, "fill": FILLS, "angle": ANGLES, "count": COUNTS}
+ATTRS = ["shape", "scale", "fill", "angle", "count", "inner", "bars", "frames"]
+DOMAIN = {"shape": SHAPES, "scale": SCALES, "fill": FILLS, "angle": ANGLES,
+          "count": COUNTS, "inner": INNERS, "bars": BARS, "frames": FRAMES}
 
 
 def _row_values(attr, kind, rng):
@@ -178,6 +230,7 @@ def make_attribute_problem(rng, three=True, n_active=None):
         plan[attr] = rng.choice(kinds)
 
     grid = [[dict() for _ in range(cols)] for _ in range(rows)]
+    composed = rng.random() < 0.45
     for attr in ATTRS:
         kind = plan[attr]
         dom = DOMAIN[attr]
@@ -202,6 +255,15 @@ def make_attribute_problem(rng, three=True, n_active=None):
                 start = rng.randrange(len(dom))
                 for c in range(cols):
                     grid[r][c][attr] = dom[(start + step * c) % len(dom)]
+
+    # a panel is either a repeated simple shape or one composed shape, never both
+    for r in range(rows):
+        for c in range(cols):
+            cell = grid[r][c]
+            if composed:
+                cell["count"] = 1
+            else:
+                cell["inner"], cell["bars"], cell["frames"] = "none", "none", 1
     return grid, plan
 
 
@@ -214,10 +276,10 @@ def make_logic_problem(rng, three=True):
     op = rng.choice(["xor", "or", "and"])
     grid = [[None] * 3 for _ in range(rows)]
     for r in range(rows):
-        a = render({"shape": rng.choice(SHAPES), "scale": rng.choice(SCALES[1:]),
-                    "fill": 1, "angle": rng.choice(ANGLES), "count": 1})
-        b = render({"shape": rng.choice(SHAPES), "scale": rng.choice(SCALES[1:]),
-                    "fill": 1, "angle": rng.choice(ANGLES), "count": 1})
+        simple = lambda: {"shape": rng.choice(SHAPES), "scale": rng.choice(SCALES[1:]),
+                          "fill": 1, "angle": rng.choice(ANGLES), "count": 1,
+                          "inner": "none", "bars": "none", "frames": 1}
+        a, b = render(simple()), render(simple())
         ai, bi = a < 128, b < 128
         ci = {"xor": ai ^ bi, "or": ai | bi, "and": ai & bi}[op]
         grid[r] = [a, b, np.where(ci, 0, 255).astype(np.uint8)]
@@ -249,9 +311,10 @@ def make_problem(rng, three=True, augment=True):
         # distractors: other rows' answers and pixel-perturbed variants
         pool = [grid[0][2], grid[1][2]]
         while len(pool) < 7:
-            a = render({"shape": rng.choice(SHAPES), "scale": rng.choice(SCALES[1:]),
-                        "fill": 1, "angle": rng.choice(ANGLES), "count": 1})
-            pool.append(a)
+            pool.append(render({"shape": rng.choice(SHAPES),
+                                "scale": rng.choice(SCALES[1:]), "fill": 1,
+                                "angle": rng.choice(ANGLES), "count": 1,
+                                "inner": "none", "bars": "none", "frames": 1}))
         opts = pool[:7] + [answer]
     else:
         grid, _ = make_attribute_problem(rng, three)

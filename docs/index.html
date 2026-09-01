@@ -261,20 +261,26 @@ footer p { max-width:74ch; }
 <section><div class="sec-head"><span class="lab">What it cost</span><h2>Building all of this</h2></div>
 <p>Measured from the Claude Code session transcript with <code>scripts/session_stats.py</code>, not estimated. One model, <strong>claude-opus-5</strong>, driving a shell. These are a snapshot taken while the session was still running, so the real totals are a little higher &mdash; re-run the script to see the current figures.</p>
 <div class="costgrid">
-<div class="cell"><div class="n2">572,350</div><div class="k">output tokens &mdash; code written plus private reasoning</div></div>
-<div class="cell"><div class="n2">69,202,964</div><div class="k">cached input tokens re-read across the session</div></div>
-<div class="cell"><div class="n2">1,839</div><div class="k">lines of Python written across 10 files</div></div>
-<div class="cell"><div class="n2">166</div><div class="k">tool calls, of which 148 were shell commands</div></div>
+<div class="cell"><div class="n2">727,837</div><div class="k">output tokens &mdash; code written plus private reasoning</div></div>
+<div class="cell"><div class="n2">103,278,348</div><div class="k">cached input tokens re-read across the session</div></div>
+<div class="cell"><div class="n2">2,890</div><div class="k">lines of Python written across 10 files</div></div>
+<div class="cell"><div class="n2">208</div><div class="k">tool calls, of which 188 were shell commands</div></div>
 </div>
 <div class="two" style="margin-top:14px">
-<div class="cell stack"><span class="cell-tag">i</span><h3>Almost every token was a re-read</h3><p style="margin:0">Only <strong>692</strong> input tokens were new. <strong>69,202,964</strong> were cache reads of the same growing conversation &mdash; a ratio of about <strong>100,004:1</strong>. Prompt caching is what makes an hour-long agentic session affordable at all: the model re-reads its entire working context on every single turn.</p></div>
-<div class="cell stack"><span class="cell-tag">ii</span><h3>Output was code, not conversation</h3><p style="margin:0">Roughly 572,350 output tokens against about 8,000 characters of prose actually shown on screen. Nearly everything the model produced was source code and reasoning it did not print &mdash; the visible chat is a rounding error on the work.</p></div></div>
+<div class="cell stack"><span class="cell-tag">i</span><h3>Almost every token was a re-read</h3><p style="margin:0">Only <strong>864</strong> input tokens were new. <strong>103,278,348</strong> were cache reads of the same growing conversation &mdash; a ratio of about <strong>119,535:1</strong>. Prompt caching is what makes an hour-long agentic session affordable at all: the model re-reads its entire working context on every single turn.</p></div>
+<div class="cell stack"><span class="cell-tag">ii</span><h3>Output was code, not conversation</h3><p style="margin:0">Roughly 727,837 output tokens against about 8,000 characters of prose actually shown on screen. Nearly everything the model produced was source code and reasoning it did not print &mdash; the visible chat is a rounding error on the work.</p></div></div>
 <div class="tablewrap" style="margin-top:14px"><table><thead><tr><th>Written</th><th class="n">Lines</th><th>Note</th></tr></thead><tbody>
-<tr><td>Python (the three agents + tooling)</td><td class="n">1,839</td><td>10 files, excluding the vendored 2017 source</td></tr>
-<tr><td>Prose (READMEs, notes, build log)</td><td class="n">466</td><td>Markdown</td></tr>
-<tr><td>Generated output</td><td class="n">194</td><td>COMPARISON.md, this page, the chart &mdash; all produced by the scripts above</td></tr>
-<tr><td>Result data</td><td class="n">1,567</td><td>CSVs and logs from the runs</td></tr>
+<tr><td>Python (the three agents + tooling)</td><td class="n">2,890</td><td>10 files, excluding the vendored 2017 source</td></tr>
+<tr><td>Prose (READMEs, notes, build log)</td><td class="n">712</td><td>Markdown</td></tr>
+<tr><td>Generated output</td><td class="n">489</td><td>COMPARISON.md, this page, the chart &mdash; all produced by the scripts above</td></tr>
+<tr><td>Result data</td><td class="n">2,113</td><td>CSVs and logs from the runs</td></tr>
 </tbody></table></div></section>
+<section><div class="sec-head"><span class="lab">Epilogue &mdash; added after class</span><h2>Three things the session did not settle</h2></div>
+<p>Everything above ran live and is untouched. These were added afterwards, and the full write-up is in <code>EPILOGUE.md</code>.</p>
+<div class="three">
+<div class="cell stack"><span class="cell-tag">2</span><h3>A plain 70/30 split</h3><div class="num" style="font-size:40px">66%</div><p style="margin:6px 0 0">Stratified, 67 train / 29 test, over 3 seeds. <em>Higher</em> than the leave-one-set-out number above, because a random split lets the model see every problem family during training. The gap between the two is how much the agent depends on having met that kind of puzzle before.</p><p style="margin:0;font-size:15px;color:var(--s2)">The model weights were always held out. The <em>feature design</em> was not: set D's failures were inspected and rule families added because of them. No re-split fixes that.</p></div>
+<div class="cell stack"><span class="cell-tag">3</span><h3>Other labs</h3><p style="margin:6px 0 0">The in-class runs were all OpenAI. The epilogue adds one flagship vision model per lab on the identical prompt, with the dollar cost of every run. GPT-3.5 cannot be entered at all &mdash; it has no image input, so the barrier is modality, not reasoning.</p></div>
+</div></section>
 <section><div class="sec-head"><span class="lab">Method</span><h2>How to read these numbers</h2></div><div class="two">
 <div class="cell stack"><span class="cell-tag">A</span><h3>Everyone gets the same input</h3><p style="margin:0">Panel images only. Two of the eight sets ship with a verbal description of each figure; the other six do not, so it is withheld from all three agents. The 2017 agent's author had already disabled that path anyway.</p></div>
 <div class="cell stack"><span class="cell-tag">B</span><h3>The learned part is cross-validated</h3><p style="margin:0">Agent B trains on seven problem sets and is tested on the eighth, with every hyper-parameter chosen inside the training folds. Rule search with no training at all scores 49/96; scoring the ranker on the very problems it was fitted to gives 62/96, only 3 more &mdash; which is how you know it is learning which rules to trust rather than memorising answers.</p></div>
