@@ -12,6 +12,17 @@ how far the same problem gets you across three eras of technique:
 Full write-up with per-set and per-problem breakdowns: **[COMPARISON.md](COMPARISON.md)**.
 
 <!-- HEADLINE:START -->
+## Results
+
+| Agent | Correct | Accuracy | Skipped | Wall clock | Needs network |
+|---|---|---|---|---|---|
+| Original (2017) | 34/96 | **35.4%** | 24 | 34 s | no |
+| Classical AI (no training) | 49/96 | **51.0%** | 0 | - | no |
+| Classical AI + learned ranker | 59/96 | **61.5%** | 0 | 54 s | no |
+| LLM: gpt-5.6-sol | 93/96 | **96.9%** | 0 | 77 s | yes |
+| LLM: gpt-5.6-terra | 89/96 | **92.7%** | 0 | 193 s | yes |
+
+Chance is 13.5% (24 problems with 6 options, 72 with 8). Wall clock for the two local agents is single-process on a laptop; for the LLMs it is the whole 96-problem sweep at 10 concurrent requests.
 <!-- HEADLINE:END -->
 
 ## The problems
@@ -65,3 +76,11 @@ results/             every run's raw CSV output
 - **Agent 3** is scored on a public benchmark that has been on GitHub since 2017.
   Training-data contamination cannot be ruled out. See
   [03_llm/README.md](03_llm/README.md).
+
+## Credits
+
+The 96 problems and the course harness come from the Georgia Tech
+*Knowledge-Based AI* project, via
+[`bcollier/KBAI_Ravens_Project`](https://github.com/bcollier/KBAI_Ravens_Project).
+Agents 2 and 3, the evaluation harness and the write-up were built with
+[Claude Code](https://claude.com/claude-code).

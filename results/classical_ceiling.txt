@@ -1,0 +1,4 @@
+                            Basic B      Basic C      Basic D      Basic E  Challenge B  Challenge C  Challenge D  Challenge E    total
+any rule                         11           12           12           12           12           12           12           12     95/96
+best-family oracle               11           12           11           12           11           12           11           10     90/96
+most-trusted rule                 4            1            7            7            3            5            3            4     34/96

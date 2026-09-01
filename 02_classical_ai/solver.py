@@ -227,6 +227,13 @@ def main():
     print(f"  [C] same, leave-one-PROBLEM-out   : {round(loo_acc*96)}/96  {loo_acc:.1%}"
           f"   (tau={tau}, gamma={gamma}, C={C})")
 
+    # [D] fitted and scored on the same 96 problems. Not a result -- printed so
+    # the gap between it and [B] is visible.
+    ins = PairwiseRanker(C).fit(Xs, [p.answer for p in problems])
+    ins_preds = [ins.predict(X) for X in Xs]
+    ins_acc = accuracy(problems, ins_preds)
+    print(f"  [D] in-sample (NOT a fair score)  : {round(ins_acc*96)}/96  {ins_acc:.1%}")
+
     print("\nPer set (nested leave-one-set-out):")
     pb, pl = per_set(problems, base_preds), per_set(problems, lp)
     print(f"  {'set':26s} {'no training':>12s} {'+ ranker':>10s}")
@@ -245,12 +252,12 @@ def main():
         fh.write(f"rule_search_only        : {base_acc:.4f}\n")
         fh.write(f"rule_search_plus_ranker : {lacc:.4f}\n")
         fh.write(f"leave_one_problem_out   : {loo_acc:.4f}\n")
+        fh.write(f"in_sample_not_a_result  : {ins_acc:.4f}\n")
         fh.write(f"runtime_seconds         : {runtime:.2f}\n")
         fh.write(f"hyperparams_per_fold    : {lchoice}\n")
 
     # what did the ranker learn to trust? (fit on everything, for the write-up)
-    final = PairwiseRanker(C).fit(Xs, [p.answer for p in problems])
-    coef = final.model.coef_.ravel()
+    coef = ins.model.coef_.ravel()
     print("\nWhat the ranker learned to trust (top 12):")
     for i in np.argsort(-np.abs(coef))[:12]:
         print(f"  {features.FEATURE_NAMES[i]:24s} {coef[i]:+.3f}")

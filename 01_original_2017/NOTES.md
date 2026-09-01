@@ -5,7 +5,11 @@ last commit *"Final submission, project 3"*. Vendored here **byte-for-byte** —
 `Agent.py` and the six harness files are identical to the upstream repo. Verify with:
 
 ```bash
-diff -r <(git -C /path/to/KBAI_Ravens_Project ls-files) .   # or just diff Agent.py
+git clone https://github.com/bcollier/KBAI_Ravens_Project /tmp/kbai
+for f in Agent.py ProblemSet.py RavensFigure.py RavensGrader.py \
+         RavensObject.py RavensProblem.py RavensProject.py; do
+  diff -q "/tmp/kbai/$f" "$f" && echo "identical  $f"
+done
 ```
 
 ## Does it still run?
@@ -13,7 +17,9 @@ diff -r <(git -C /path/to/KBAI_Ravens_Project ls-files) .   # or just diff Agent
 **Yes, with zero changes.** It was written for Python 3 with Pillow and numpy, and
 it runs unmodified on Python 3.12.7 / Pillow 10.4 / numpy 1.26. No deprecation
 errors, no porting, no shims. The only thing added to this directory is
-`typo_experiment.py`, which does not touch `Agent.py`.
+`typo_experiment.py`, which does not touch `Agent.py`. Not vendored: the
+upstream repo's `API/` javadoc, `submit.py`, `bonnie/` autograder client,
+`imagechops_scratch.py` and `.idea/` — none are needed to run the agent.
 
 ```bash
 python run_original.py       # from the repo root
