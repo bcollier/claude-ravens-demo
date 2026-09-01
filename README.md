@@ -8,11 +8,13 @@ how far the same problem gets you across three eras of technique:
 | 1 | [`01_original_2017/`](01_original_2017/) | the original 2017 Georgia Tech KBAI submission, run unmodified |
 | 2 | [`02_classical_ai/`](02_classical_ai/) | symbolic rule search + classical CV + a learned ranker — **no LLM, no neural network** |
 | 3 | [`03_llm/`](03_llm/) | one OpenAI multimodal reasoning call per problem |
+| 4 | [`04_neural/`](04_neural/) | *(epilogue)* a relation network trained on synthetic matrices — still no LLM |
 
 | where to start | |
 |---|---|
 | **[Raven's Three Ways](https://claude.ai/code/artifact/af68d3b9-f040-47cc-a3cc-5a220595074b)** | the illustrated version: architecture diagrams, the dead ends, what it cost |
-| **[COMPARISON.md](COMPARISON.md)** | every number, per set and per problem |
+| **[COMPARISON.md](COMPARISON.md)** | every number, per set and per problem — exactly as it ran in class |
+| **[EPILOGUE.md](EPILOGUE.md)** | added afterwards: a neural network, a 70/30 split, and one model per lab |
 | **[docs/BUILD_LOG.md](docs/BUILD_LOG.md)** | the lab notebook — 16 experiments, 6 of them dropped |
 | **[01_original_2017/NOTES.md](01_original_2017/NOTES.md)** | what the 2017 code did, what worked, what was missing |
 | **[PROVENANCE.md](PROVENANCE.md)** | the brief, the models, the environment, every judgement call |

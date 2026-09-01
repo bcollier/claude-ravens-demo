@@ -1,0 +1,56 @@
+=== gpt-4-turbo ===
+    gpt-4-turbo: 12/96 done, 0 correct
+    gpt-4-turbo: 24/96 done, 0 correct
+    gpt-4-turbo: 36/96 done, 0 correct
+    gpt-4-turbo: 48/96 done, 0 correct
+    gpt-4-turbo: 60/96 done, 0 correct
+    gpt-4-turbo: 72/96 done, 0 correct
+    gpt-4-turbo: 84/96 done, 0 correct
+    gpt-4-turbo: 96/96 done, 0 correct
+  gpt-4-turbo                                   0/96 =  0.0%  $ 0.000    176s  96 unparseable
+=== gpt-4o ===
+    gpt-4o: 12/96 done, 7 correct
+    gpt-4o: 24/96 done, 13 correct
+    gpt-4o: 36/96 done, 19 correct
+    gpt-4o: 48/96 done, 25 correct
+    gpt-4o: 60/96 done, 29 correct
+    gpt-4o: 72/96 done, 35 correct
+    gpt-4o: 84/96 done, 39 correct
+    gpt-4o: 96/96 done, 41 correct
+  gpt-4o                                       41/96 = 42.7%  $ 0.000     36s  0 unparseable
+=== gpt-4.1 ===
+    gpt-4.1: 12/96 done, 8 correct
+    gpt-4.1: 24/96 done, 15 correct
+    gpt-4.1: 36/96 done, 19 correct
+    gpt-4.1: 48/96 done, 23 correct
+    gpt-4.1: 60/96 done, 27 correct
+    gpt-4.1: 72/96 done, 32 correct
+    gpt-4.1: 84/96 done, 34 correct
+    gpt-4.1: 96/96 done, 36 correct
+  gpt-4.1                                      36/96 = 37.5%  $ 0.000     33s  0 unparseable
+=== o3 ===
+    o3: 12/96 done, 0 correct
+    o3: 24/96 done, 0 correct
+    o3: 36/96 done, 0 correct
+    o3: 48/96 done, 0 correct
+    o3: 60/96 done, 0 correct
+    o3: 72/96 done, 0 correct
+    o3: 84/96 done, 0 correct
+    o3: 96/96 done, 0 correct
+  o3                                            0/96 =  0.0%  $ 0.000    120s  96 unparseable
+
+Total OpenRouter spend this sweep: $0.00
+=== gpt-4-turbo ===
+    gpt-4-turbo: 12/96 done, 7 correct
+    gpt-4-turbo: 24/96 done, 15 correct
+    gpt-4-turbo: 36/96 done, 18 correct
+    gpt-4-turbo: 48/96 done, 23 correct
+    gpt-4-turbo: 60/96 done, 27 correct
+    gpt-4-turbo: 72/96 done, 30 correct
+    gpt-4-turbo: 84/96 done, 33 correct
+    gpt-4-turbo: 96/96 done, 34 correct
+  gpt-4-turbo                                  34/96 = 35.4%  $ 0.000    101s  0 unparseable
+=== o3 ===
+    o3: 12/96 done, 11 correct
+    o3: 24/96 done, 22 correct
+    o3: 36/96 done, 34 correct

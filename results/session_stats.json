@@ -43,7 +43,11 @@
       ],
       "COMPARISON.md": [
         "generated output",
-        194
+        196
+      ],
+      "PROVENANCE.md": [
+        "prose",
+        118
       ],
       "README.md": [
         "prose",
@@ -52,6 +56,14 @@
       "common/ravens.py": [
         "python",
         119
+      ],
+      "docs/BUILD_LOG.md": [
+        "prose",
+        128
+      ],
+      "docs/index.html": [
+        "generated output",
+        293
       ],
       "requirements.txt": [
         "prose",
@@ -89,6 +101,14 @@
         "results data",
         7
       ],
+      "results/llm_gpt_5_answers.csv": [
+        "results data",
+        97
+      ],
+      "results/llm_gpt_5_summary.txt": [
+        "results data",
+        7
+      ],
       "results/llm_runs.log": [
         "results data",
         330
@@ -117,6 +137,14 @@
         "results data",
         5
       ],
+      "results/session_stats.json": [
+        "results data",
+        396
+      ],
+      "results/session_timeline.txt": [
+        "results data",
+        46
+      ],
       "run_llm_all.sh": [
         "config",
         8
@@ -127,43 +155,68 @@
       ],
       "scripts/compare.py": [
         "python",
-        367
+        380
       ],
       "scripts/make_chart.py": [
         "python",
         90
+      ],
+      "scripts/make_page.py": [
+        "python",
+        831
+      ],
+      "scripts/session_stats.py": [
+        "python",
+        207
       ]
     },
     "by_kind": {
       "config": 17,
-      "generated output": 194,
-      "prose": 466,
-      "python": 1839,
-      "results data": 1567
+      "generated output": 489,
+      "prose": 712,
+      "python": 2890,
+      "results data": 2113
+    }
+  },
+  "epilogue": {
+    "found": true,
+    "from": "2026-09-01T18:24:43.817Z",
+    "model_turns": 80,
+    "span_seconds": 1266.84,
+    "to": "2026-09-01T18:45:50.657Z",
+    "tools": {
+      "Bash": 38,
+      "Read": 1
+    },
+    "usage": {
+      "cache_creation_input_tokens": 167835,
+      "cache_read_input_tokens": 31931894,
+      "input_tokens": 160,
+      "output_tokens": 150470
     }
   },
   "session": {
-    "model_turns": 346,
+    "model_turns": 432,
     "models": {
-      "claude-opus-5": 346
+      "claude-opus-5": 432
     },
-    "span_seconds": 4891.132,
+    "span_seconds": 6432.298,
     "tools": {
-      "Artifact": 1,
+      "Artifact": 2,
       "AskUserQuestion": 1,
-      "Bash": 148,
+      "Bash": 188,
       "Monitor": 1,
-      "Read": 9,
+      "Read": 10,
       "Skill": 3,
       "ToolSearch": 2,
       "mcp__claude-in-chrome__tabs_context_mcp": 1
     },
     "transcript": "55d7f79e-2372-4ef3-8283-fbfdcc34a1ca.jsonl",
     "usage": {
-      "cache_creation_input_tokens": 1188318,
-      "cache_read_input_tokens": 69202964,
-      "input_tokens": 692,
-      "output_tokens": 572350
+      "cache_creation_input_tokens": 1365292,
+      "cache_read_input_tokens": 103278348,
+      "input_tokens": 864,
+      "output_tokens": 727837
     }
   },
   "timeline": [

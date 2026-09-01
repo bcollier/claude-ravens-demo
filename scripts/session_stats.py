@@ -104,6 +104,45 @@ def timeline(path, tz_hours=-4):
     return out
 
 
+def usage_since(path, marker):
+    """Token usage for the part of the session after a user message containing
+    `marker` -- used to cost the epilogue separately from the in-class work."""
+    started = False
+    usage = collections.Counter()
+    tools = collections.Counter()
+    turns = 0
+    first = last = None
+    for line in open(path):
+        try:
+            rec = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        msg = rec.get("message") or {}
+        if not started:
+            if msg.get("role") == "user" and marker in json.dumps(msg.get("content", "")):
+                started = True
+                first = rec.get("timestamp")
+            continue
+        if rec.get("timestamp"):
+            last = rec["timestamp"]
+        u = msg.get("usage") or rec.get("usage")
+        if u:
+            turns += 1
+            for k, v in u.items():
+                if isinstance(v, int):
+                    usage[k] += v
+        if msg.get("role") == "assistant":
+            for b in (msg.get("content") or []):
+                if isinstance(b, dict) and b.get("type") == "tool_use":
+                    tools[b["name"]] += 1
+    span = None
+    if first and last:
+        f = lambda s: datetime.datetime.fromisoformat(s.replace("Z", "+00:00"))
+        span = (f(last) - f(first)).total_seconds()
+    return {"found": started, "usage": dict(usage), "tools": dict(tools),
+            "model_turns": turns, "span_seconds": span, "from": first, "to": last}
+
+
 def code_stats():
     files = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True,
                            text=True).stdout.split()
@@ -152,6 +191,9 @@ def main():
             for when, label, ev in tl:
                 fh.write(f"{when}  {label:28s}  {ev}\n")
         print(f"wrote {tpath}  ({len(tl)} milestones)")
+
+    if path and os.path.exists(path):
+        out["epilogue"] = usage_since(path, "comparisons added after class")
 
     dest = os.path.join(ROOT, "results", "session_stats.json")
     with open(dest, "w") as fh:

@@ -1,0 +1,12 @@
+model            : gpt-4.1
+provider_route   : openai
+problems         : 96
+correct          : 36
+accuracy         : 0.3750
+wall_seconds     : 33.19
+workers          : 8
+cost_usd         : 0.0000
+unparseable      : 0
+input_tokens     : 454896
+output_tokens    : 5435
+reasoning_tokens : 0

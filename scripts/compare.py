@@ -11,7 +11,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "common"))
-import ravens  # noqa: E402
+import ravens   # noqa: E402
+import pricing  # noqa: E402
 
 RESULTS = os.path.join(ROOT, "results")
 PROBLEMS = ravens.load_all()
@@ -197,15 +198,27 @@ def main():
     llm_runs = [(l, e) for l, a, e, c, s in scored if e.get("kind") == "llm"]
     if llm_runs:
         w("## What the LLM runs cost\n")
+        table = pricing.fetch()
         w("| Model | Accuracy | Input tokens | Output tokens | of which reasoning | "
-          "Sum of per-call latency | API errors |")
-        w("|---|---|---|---|---|---|---|")
+          "Cost | Cost per correct answer | Sum of per-call latency | API errors |")
+        w("|---|---|---|---|---|---|---|---|---|")
+        total_cost = 0.0
         for label, ex in llm_runs:
             acc = next(sum(cc.values()) for l, a, e, cc, s in scored if l == label)
+            cost, _ = pricing.estimate(label[5:], ex["in_tokens"], ex["out_tokens"], table)
+            total_cost += cost or 0
+            cs = f"${cost:.2f}" if cost is not None else "-"
+            cpc = f"${cost/acc:.3f}" if cost is not None and acc else "-"
             w(f"| {label[5:]} | {acc}/{n} ({acc/n:.0%}) | {ex['in_tokens']:,} | "
-              f"{ex['out_tokens']:,} | {ex['reasoning_tokens']:,} | "
+              f"{ex['out_tokens']:,} | {ex['reasoning_tokens']:,} | {cs} | {cpc} | "
               f"{ex['runtime']:.0f} s | {ex['errors']} |")
         w("")
+        w(f"**Total for the three in-class LLM sweeps: ${total_cost:.2f}.** Costs are "
+          "token counts multiplied by OpenRouter's published list price for the same "
+          "model (snapshotted in `results/pricing_snapshot.json`); the runs themselves "
+          "went straight to OpenAI, which does not return a charge with the response. "
+          "Reasoning tokens are billed as output. For scale, the two local agents cost "
+          "nothing but about 90 seconds of laptop time between them.\n")
         w("Runs used 10 concurrent workers, so wall-clock in the headline table is "
           "much lower than the summed latency here.\n")
 

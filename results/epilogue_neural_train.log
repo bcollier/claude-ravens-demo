@@ -1,0 +1,18 @@
+device: mps
+training the relation network on synthetic matrices (5000 steps x batch 32) ...
+  step   250  loss 2.026  synthetic-val 18.8%  (20s)
+  step   500  loss 1.803  synthetic-val 10.2%  (38s)
+  step   750  loss 1.689  synthetic-val 20.7%  (57s)
+  step  1000  loss 1.748  synthetic-val 30.5%  (76s)
+  step  1250  loss 1.691  synthetic-val 29.7%  (93s)
+  step  1500  loss 1.497  synthetic-val 30.9%  (111s)
+  step  1750  loss 1.326  synthetic-val 32.8%  (130s)
+  step  2000  loss 1.545  synthetic-val 43.0%  (147s)
+  step  2250  loss 1.431  synthetic-val 45.7%  (165s)
+  step  2500  loss 1.132  synthetic-val 46.5%  (183s)
+  step  2750  loss 0.980  synthetic-val 52.3%  (201s)
+  step  3000  loss 1.149  synthetic-val 51.6%  (219s)
+  step  3250  loss 1.317  synthetic-val 53.9%  (237s)
+  step  3500  loss 0.906  synthetic-val 53.1%  (256s)
+  step  3750  loss 1.144  synthetic-val 54.3%  (275s)
+  step  4000  loss 1.096  synthetic-val 57.0%  (293s)

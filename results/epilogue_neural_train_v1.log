@@ -1,0 +1,35 @@
+device: mps
+training the relation network on synthetic matrices (5000 steps x batch 32) ...
+  step   250  loss 1.988  synthetic-val 14.8%  (21s)
+  step   500  loss 1.828  synthetic-val 16.8%  (40s)
+  step   750  loss 1.878  synthetic-val 19.9%  (59s)
+  step  1000  loss 1.743  synthetic-val 21.1%  (80s)
+  step  1250  loss 1.795  synthetic-val 24.2%  (106s)
+  step  1500  loss 1.801  synthetic-val 19.1%  (130s)
+  step  1750  loss 1.656  synthetic-val 19.9%  (148s)
+  step  2000  loss 1.706  synthetic-val 25.8%  (165s)
+  step  2250  loss 1.802  synthetic-val 26.2%  (187s)
+  step  2500  loss 1.753  synthetic-val 27.3%  (212s)
+  step  2750  loss 1.498  synthetic-val 33.6%  (237s)
+  step  3000  loss 1.550  synthetic-val 29.7%  (261s)
+  step  3250  loss 1.585  synthetic-val 29.7%  (286s)
+  step  3500  loss 1.490  synthetic-val 28.1%  (310s)
+  step  3750  loss 1.565  synthetic-val 32.0%  (329s)
+  step  4000  loss 1.651  synthetic-val 30.5%  (347s)
+  step  4250  loss 1.491  synthetic-val 29.3%  (363s)
+  step  4500  loss 1.663  synthetic-val 28.1%  (381s)
+  step  4750  loss 1.094  synthetic-val 29.3%  (399s)
+  step  5000  loss 1.391  synthetic-val 28.5%  (417s)
+
+D1 relation network on the real 96: 15/96 = 15.6%
+  Basic Problems B            4/12
+  Basic Problems C            4/12
+  Basic Problems D            1/12
+  Basic Problems E            1/12
+  Challenge Problems B        0/12
+  Challenge Problems C        2/12
+  Challenge Problems D        0/12
+  Challenge Problems E        3/12
+
+synthetic validation accuracy at the end of training: 28.5%
+total 419s

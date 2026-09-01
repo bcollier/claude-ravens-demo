@@ -46,11 +46,13 @@ Comparing the 2017 agent, the classical agent and the strongest LLM (`gpt-5.6-so
 
 ## What the LLM runs cost
 
-| Model | Accuracy | Input tokens | Output tokens | of which reasoning | Sum of per-call latency | API errors |
-|---|---|---|---|---|---|---|
-| gpt-5.6-sol | 93/96 (97%) | 243,912 | 29,504 | 24,621 | 698 s | 0 |
-| gpt-5.6-terra | 89/96 (93%) | 243,912 | 44,419 | 39,659 | 920 s | 0 |
-| gpt-5 | 84/96 (88%) | 383,928 | 484,800 | 474,880 | 9104 s | 0 |
+| Model | Accuracy | Input tokens | Output tokens | of which reasoning | Cost | Cost per correct answer | Sum of per-call latency | API errors |
+|---|---|---|---|---|---|---|---|---|
+| gpt-5.6-sol | 93/96 (97%) | 243,912 | 29,504 | 24,621 | $0.78 | $0.008 | 698 s | 0 |
+| gpt-5.6-terra | 89/96 (93%) | 243,912 | 44,419 | 39,659 | $1.02 | $0.011 | 920 s | 0 |
+| gpt-5 | 84/96 (88%) | 383,928 | 484,800 | 474,880 | $5.33 | $0.063 | 9104 s | 0 |
+
+**Total for the three in-class LLM sweeps: $7.13.** Costs are token counts multiplied by OpenRouter's published list price for the same model (snapshotted in `results/pricing_snapshot.json`); the runs themselves went straight to OpenAI, which does not return a charge with the response. Reasoning tokens are billed as output. For scale, the two local agents cost nothing but about 90 seconds of laptop time between them.
 
 Runs used 10 concurrent workers, so wall-clock in the headline table is much lower than the summed latency here.
 

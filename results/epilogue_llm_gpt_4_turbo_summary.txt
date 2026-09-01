@@ -1,0 +1,12 @@
+model            : gpt-4-turbo
+provider_route   : openai
+problems         : 96
+correct          : 34
+accuracy         : 0.3542
+wall_seconds     : 101.46
+workers          : 8
+cost_usd         : 0.0000
+unparseable      : 0
+input_tokens     : 454896
+output_tokens    : 4299
+reasoning_tokens : 0
