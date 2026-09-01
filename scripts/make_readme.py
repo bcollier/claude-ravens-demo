@@ -379,6 +379,19 @@ def main():
     w("Costs are for all 96 puzzles. Times are for the whole sweep with ten requests "
       "running at once. Release dates are the date each model was first publicly "
       "listed.\n")
+    w("### Which is fastest?\n")
+    w("![Median seconds to answer one puzzle, by model](docs/speed.png)\n")
+    w("Wall clock for a whole sweep depends on how many requests were run at once, "
+      "so this is the median time to answer a *single* puzzle. The spread is 34x, "
+      "from 2.4 seconds to 80.6.\n")
+    w("The useful corner is top-left: fast **and** accurate. `gpt-5.6-terra` answers "
+      "in 5 seconds at 89/96 and `gpt-5.6-sol` in 5.4 at 93/96, while `kimi-k3` takes "
+      "**fifteen times longer** to reach the same 92 that `gemini-3.7-flash` reaches "
+      "in 8. Slow does not buy accuracy here; the models at the bottom of the chart "
+      "are not the ones at the top of the table.\n")
+    w("The two genuinely quick models, `gpt-4.1` and `gpt-4o` at under 3 seconds, are "
+      "quick because they answer immediately rather than working the problem through "
+      "— and they score 36 and 41. That trade is the subject of the next chart.\n")
     w("### The same company, over two and a half years\n")
     w("![OpenAI models on the same 96 problems, by release date](docs/openai_timeline.png)\n")
     w("Two models released **two days apart** sit on opposite sides of the line. "
@@ -418,9 +431,11 @@ def main():
           + ", ".join(f"`{r['model']}` at {r['correct']}/{N}" for r in below[:4])
           + f", against {n_clas}/{N}. \"We used AI\" tells you almost nothing; which "
           f"model, and how it was asked, is most of the outcome.\n")
-    w("**One model could not sit the test at all.** `gpt-3.5-turbo`, the model that "
-      "made ChatGPT famous in 2022, cannot accept images. Not a low score — no score. "
-      "The barrier is what it can perceive, not how well it reasons.\n")
+    w("**Not every model can sit the test.** `gpt-3.5-turbo`, the model that made "
+      "ChatGPT famous in 2022, is still listed and still callable — but it accepts "
+      "text only. Send it one of these puzzles and the API answers `404 No endpoints "
+      "found that support image input`. It is left out of the comparison for that "
+      "reason: there is no way to give it the question.\n")
     w("### Could it be cheaper?\n")
     bp = os.path.join(RESULTS, "epilogue_batch_estimate.md")
     if os.path.exists(bp):

@@ -17,6 +17,7 @@ GRID = "#e3e2de"
 # normal-vision dE 27.6). Colour encodes the technique family; the bar labels
 # carry identity, which is also the relief for aqua's sub-3:1 contrast.
 FAMILY_COLOR = {"original": "#2a78d6", "classical": "#eb6834", "llm": "#1baf7a"}
+GREY = "#c3cbd4"
 FAMILY_LABEL = {"original": "2017 original", "classical": "Classical AI (no LLM)",
                 "llm": "LLM"}
 
@@ -172,5 +173,78 @@ def build_timeline(company="openai"):
         os.path.join(root, "docs", "openai_timeline.png"))
 
 
+
+
+# --------------------------------------------------------------- speed
+
+def speed_chart(rows, out_path, strong_at=89, n_problems=96):
+    """rows: [(median_seconds, model, correct)] sorted fastest first.
+
+    Wall-clock for a whole sweep is confounded by how many requests were run at
+    once, so speed is the median time for a single puzzle."""
+    fig, ax = plt.subplots(figsize=(10, 0.42 * len(rows) + 2.0), dpi=160)
+    fig.patch.set_facecolor(SURFACE)
+    ax.set_facecolor(SURFACE)
+
+    ys = list(range(len(rows)))[::-1]
+    fastest_good = next((r for r in rows if r[2] >= strong_at), None)
+
+    for y, (secs, model, correct) in zip(ys, rows):
+        good = correct >= strong_at
+        colour = FAMILY_COLOR["llm"] if good else GREY
+        ax.barh(y, secs, height=0.62, color=colour, zorder=3)
+        ax.text(secs + max(r[0] for r in rows) * 0.014, y,
+                f"{secs:.1f} s   ·   {correct}/{n_problems}",
+                va="center", ha="left", fontsize=10,
+                color=INK if good else INK_2, zorder=4)
+        if fastest_good and model == fastest_good[1]:
+            ax.text(secs + max(r[0] for r in rows) * 0.22, y,
+                    "fastest of the accurate models", va="center", ha="left",
+                    fontsize=9.5, color=FAMILY_COLOR["llm"], style="italic")
+
+    ax.set_yticks(list(ys))
+    ax.set_yticklabels([r[1].split("/")[-1] for r in rows], fontsize=10, color=INK)
+    ax.set_xlim(0, max(r[0] for r in rows) * 1.42)
+    ax.set_xlabel("median seconds to answer one puzzle", fontsize=10, color=INK_2)
+    ax.tick_params(axis="x", labelsize=9, colors=INK_2)
+    ax.set_title("How long one puzzle takes, and how often it is right",
+                 fontsize=13.5, color=INK, loc="left", pad=14)
+    _recede(ax, axis="x")
+
+    from matplotlib.patches import Patch
+    leg = ax.legend(handles=[Patch(color=FAMILY_COLOR["llm"], label=f"scored {strong_at}/96 or better"),
+                             Patch(color=GREY, label="scored below that")],
+                    frameon=False, fontsize=9.5, ncol=2, loc="lower right",
+                    bbox_to_anchor=(1.0, -0.055 - 1.1 / len(rows)))
+    for t in leg.get_texts():
+        t.set_color(INK_2)
+
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    fig.savefig(out_path, facecolor=SURFACE, bbox_inches="tight", pad_inches=0.3)
+    plt.close(fig)
+    return out_path
+
+
+def build_speed():
+    import csv, glob, statistics
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    rows = []
+    for path in sorted(glob.glob(os.path.join(root, "results", "*llm_*_answers.csv"))):
+        recs = list(csv.DictReader(open(path)))
+        lat = [float(r["LatencySeconds"]) for r in recs if float(r["LatencySeconds"]) > 0]
+        if not lat:
+            continue
+        sm = path.replace("_answers.csv", "_summary.txt")
+        model = os.path.basename(path)
+        if os.path.exists(sm):
+            model = next((l.split(":", 1)[1].strip() for l in open(sm)
+                          if l.startswith("model")), model)
+        rows.append((statistics.median(lat), model,
+                     sum(int(r["Correct"]) for r in recs)))
+    rows.sort()
+    return speed_chart(rows, os.path.join(root, "docs", "speed.png"))
+
+
 if __name__ == "__main__":
     print("wrote", build_timeline())
+    print("wrote", build_speed())

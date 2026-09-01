@@ -201,6 +201,16 @@ Correct, in 4.8 seconds. Note that it did not just produce a number — it descr
 
 Costs are for all 96 puzzles. Times are for the whole sweep with ten requests running at once. Release dates are the date each model was first publicly listed.
 
+### Which is fastest?
+
+![Median seconds to answer one puzzle, by model](docs/speed.png)
+
+Wall clock for a whole sweep depends on how many requests were run at once, so this is the median time to answer a *single* puzzle. The spread is 34x, from 2.4 seconds to 80.6.
+
+The useful corner is top-left: fast **and** accurate. `gpt-5.6-terra` answers in 5 seconds at 89/96 and `gpt-5.6-sol` in 5.4 at 93/96, while `kimi-k3` takes **fifteen times longer** to reach the same 92 that `gemini-3.7-flash` reaches in 8. Slow does not buy accuracy here; the models at the bottom of the chart are not the ones at the top of the table.
+
+The two genuinely quick models, `gpt-4.1` and `gpt-4o` at under 3 seconds, are quick because they answer immediately rather than working the problem through — and they score 36 and 41. That trade is the subject of the next chart.
+
 ### The same company, over two and a half years
 
 ![OpenAI models on the same 96 problems, by release date](docs/openai_timeline.png)
@@ -215,7 +225,7 @@ Two models released **two days apart** sit on opposite sides of the line. `gpt-4
 
 **Being a language model is not enough on its own.** 5 of the 16 scored *below* the hand-written program with no AI in it at all — `deepseek/deepseek-v4-flash-vision-exp` at 51/96, `gpt-4o` at 41/96, `meta-llama/llama-4-maverick` at 41/96, `gpt-4.1` at 36/96, against 59/96. "We used AI" tells you almost nothing; which model, and how it was asked, is most of the outcome.
 
-**One model could not sit the test at all.** `gpt-3.5-turbo`, the model that made ChatGPT famous in 2022, cannot accept images. Not a low score — no score. The barrier is what it can perceive, not how well it reasons.
+**Not every model can sit the test.** `gpt-3.5-turbo`, the model that made ChatGPT famous in 2022, is still listed and still callable — but it accepts text only. Send it one of these puzzles and the API answers `404 No endpoints found that support image input`. It is left out of the comparison for that reason: there is no way to give it the question.
 
 ### Could it be cheaper?
 

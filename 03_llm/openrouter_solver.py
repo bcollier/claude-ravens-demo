@@ -113,6 +113,7 @@ TOKEN_PARAM = {}          # model -> ("max_tokens" | "max_completion_tokens", li
 
 
 def ask(client, model, problem, retries=4, route="openrouter"):
+    last = ""
     param, limit = TOKEN_PARAM.get(model, ("max_tokens", DEFAULT_MAX_TOKENS))
     extra = {"usage": {"include": True}} if route == "openrouter" else {}
     for attempt in range(retries):
@@ -146,11 +147,15 @@ def ask(client, model, problem, retries=4, route="openrouter"):
                 limit = int(m.group(1))
                 TOKEN_PARAM[model] = (param, limit)
                 continue
+            last = f"{type(exc).__name__}: {exc}"[:200]
             if attempt == retries - 1:
-                return {"answer": -1, "rule": "", "confidence": "", "latency": 0,
-                        "in_tokens": 0, "out_tokens": 0, "reasoning_tokens": 0, "cost": 0.0,
-                        "error": f"{type(exc).__name__}: {exc}"[:200]}
+                break
             time.sleep(2 ** attempt + random.random())
+    # A parameter adjustment above can consume the last attempt; never fall
+    # through to None, which reads downstream as a crash rather than a result.
+    return {"answer": -1, "rule": "", "confidence": "", "latency": 0,
+            "in_tokens": 0, "out_tokens": 0, "reasoning_tokens": 0, "cost": 0.0,
+            "error": locals().get("last", "no attempt completed")}
 
 
 def openrouter_key():
