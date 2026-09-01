@@ -38,9 +38,12 @@ rules per problem, in six families:
 
 ## 2. Test
 
-The hard part is not generating rules, it is knowing which one is in force. A
-diagnostic run showed the correct answer is the top pick of *some* family in
-**86 of 96** problems — so selection, not generation, was the bottleneck.
+The hard part is not generating rules, it is knowing which one is in force.
+`diagnose.py` measures the split: some rule somewhere picks the right answer in
+**95 of 96** problems, and an oracle that named the correct *family* and took
+its most-trusted rule would score **90 of 96**. Believing the single
+most-trusted rule in the whole problem scores **34 of 96**. Selection, not
+generation, is the bottleneck.
 
 So rules are scored the way you would score any predictor. Hide a line of the
 matrix whose answer is already visible, make the rule recover it **competing
@@ -61,7 +64,8 @@ coarse to separate the options scores about `1/k` no matter how perfectly it
 Each family casts a vote for every option, scaled by `vconf^gamma`. Summing
 those votes with no training at all answers **49/96**. A pairwise logistic
 ranker (RankNet-style, trained on `correct − wrong` feature differences) then
-learns how much to trust each family, taking it to **59/96**.
+learns how much to trust each family, taking it to **59/96** — against 34/96
+for the 2017 agent on the same problems.
 
 ## Honesty
 
@@ -76,7 +80,8 @@ friendlier standard leave-one-problem-out estimate is reported alongside.
 ```bash
 python solver.py                            # full evaluation (~60 s, cached after the first run)
 python solver.py --refresh                  # rebuild the rule cache
-python solver.py --explain "Basic Problem D-09"
+python solver.py --explain "Basic Problem E-05"
+python diagnose.py                          # the generation-vs-selection numbers above
 ```
 
 `--explain` prints the rules the engine trusted most and what each one picked.
