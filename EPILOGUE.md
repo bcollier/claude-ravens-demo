@@ -103,6 +103,7 @@ Identical inputs, identical prompt, one call per problem. Only the model changes
 |---|---|---|---|---|---|---|---|---|---|---|
 | `gpt-5.6-sol` | OpenAI | 93/96 | **96.9%** | $0.78 | $0.0084 | 77 s | 243,912 | 29,504 | — | yes |
 | `google/gemini-3.7-flash` | Google | 92/96 | **95.8%** | $1.50 | $0.02 | 144 s | 1,624,800 | 74,659 | — | no |
+| `x-ai/grok-4.6` | xAI | 92/96 | **95.8%** | $3.87 | $0.04 | 1794 s | 229,416 | 574,014 | 1 | no |
 | `google/gemini-3.1-pro-preview` | Google | 90/96 | **93.8%** | $6.64 | $0.07 | 344 s | 1,602,428 | 285,994 | 2 | no |
 | `anthropic/claude-fable-5` | Anthropic | 89/96 | **92.7%** | $4.80 | $0.05 | 146 s | 283,488 | 39,402 | — | no |
 | `gpt-5.6-terra` | OpenAI | 89/96 | **92.7%** | $1.02 | $0.01 | 193 s | 243,912 | 44,419 | — | yes |
@@ -112,7 +113,7 @@ Identical inputs, identical prompt, one call per problem. Only the model changes
 | `gpt-4.1` | OpenAI | 36/96 | **37.5%** | $0.95 | $0.03 | 33 s | 454,896 | 5,435 | — | no |
 | `gpt-4-turbo` | OpenAI | 34/96 | **35.4%** | $4.68 | $0.14 | 101 s | 454,896 | 4,299 | — | no |
 
-Epilogue model spend: **$23.34** across 7 runs of 96 problems. Costs for runs made through OpenRouter are the amount actually charged; the OpenAI-direct runs are token counts times list price.
+Epilogue model spend: **$27.20** across 8 runs of 96 problems. Costs for runs made through OpenRouter are the amount actually charged; the OpenAI-direct runs are token counts times list price.
 
 **A "no answer" has two very different causes, and they are worth separating.**
 
@@ -126,6 +127,7 @@ Epilogue model spend: **$23.34** across 7 runs of 96 problems. Costs for runs ma
 |---|---|---|---|---|---|---|---|---|
 | `gpt-5.6-sol` | 12 | 12 | 12 | 12 | 11 | 12 | 11 | 11 |
 | `google/gemini-3.7-flash` | 12 | 11 | 12 | 12 | 9 | 12 | 12 | 12 |
+| `x-ai/grok-4.6` | 11 | 12 | 12 | 11 | 10 | 12 | 12 | 12 |
 | `google/gemini-3.1-pro-preview` | 10 | 11 | 12 | 12 | 9 | 12 | 12 | 12 |
 | `anthropic/claude-fable-5` | 12 | 12 | 12 | 12 | 10 | 12 | 10 | 9 |
 | `gpt-5.6-terra` | 12 | 12 | 12 | 11 | 10 | 12 | 11 | 9 |
@@ -143,10 +145,10 @@ Epilogue model spend: **$23.34** across 7 runs of 96 problems. Costs for runs ma
 
 ## Part 4 — Do the models fail on the same problems?
 
-Yes, decisively. Taking the 7 models that score 70% or better:
+Yes, decisively. Taking the 8 models that score 70% or better:
 
-- **65 of 96 problems** were solved by every one of them.
-- The **14 problems missed by two or more** account for **71% of all errors**.
+- **64 of 96 problems** were solved by every one of them.
+- The **15 problems missed by two or more** account for **73% of all errors**.
 - Error sets overlap about **4x more than independent errors would** (Jaccard 0.16 observed against 0.04 for random failures of the same size).
 - And when several models miss the same problem, **63% of them choose the same wrong option** — against roughly 14% for guessing.
 
@@ -156,14 +158,14 @@ Independent labs, different architectures, different training data, converging o
 
 | Problem | Correct | Missed by | Answers given | Agreement |
 |---|---|---|---|---|
-| `Challenge B-03` | 3 | 5/7 | 1 (4), 5 (1) | 80% on option 1 |
-| `Challenge B-04` | 4 | 4/7 | 1 (2), 5 (2) | 50% on option 1 |
-| `Challenge D-08` | 1 | 4/7 | 2 (3), 6 (1) | 75% on option 2 |
-| `Challenge E-08` | 7 | 4/7 | 5 (2), 3 (2) | 50% on option 5 |
-| `Challenge E-09` | 1 | 4/7 | 2 (2), 5 (1), 6 (1) | 50% on option 2 |
-| `Basic C-12` | 8 | 3/7 | 5 (1), 7 (1), 6 (1) | 33% on option 5 |
-| `Challenge B-02` | 1 | 3/7 | 5 (1), 3 (1), 4 (1) | 33% on option 5 |
-| `Challenge D-05` | 2 | 3/7 | 8 (2), 3 (1) | 67% on option 8 |
+| `Challenge B-03` | 3 | 6/8 | 1 (5), 5 (1) | 83% on option 1 |
+| `Challenge B-04` | 4 | 5/8 | 5 (3), 1 (2) | 60% on option 5 |
+| `Challenge D-08` | 1 | 4/8 | 2 (3), 6 (1) | 75% on option 2 |
+| `Challenge E-08` | 7 | 4/8 | 5 (2), 3 (2) | 50% on option 5 |
+| `Challenge E-09` | 1 | 4/8 | 2 (2), 5 (1), 6 (1) | 50% on option 2 |
+| `Basic C-12` | 8 | 3/8 | 5 (1), 7 (1), 6 (1) | 33% on option 5 |
+| `Challenge B-02` | 1 | 3/8 | 5 (1), 3 (1), 4 (1) | 33% on option 5 |
+| `Challenge D-05` | 2 | 3/8 | 8 (2), 3 (1) | 67% on option 8 |
 
 ### Why: two rules, and they only apply one
 

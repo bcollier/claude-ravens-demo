@@ -1,0 +1,12 @@
+model            : x-ai/grok-4.6
+provider_route   : openrouter
+problems         : 96
+correct          : 92
+accuracy         : 0.9583
+wall_seconds     : 1793.62
+workers          : 8
+cost_usd         : 3.8662
+unparseable      : 1
+input_tokens     : 229416
+output_tokens    : 574014
+reasoning_tokens : 569028

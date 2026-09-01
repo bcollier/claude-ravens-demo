@@ -10,3 +10,7 @@ SetResults.csv
 
 # never commit an API key
 .openrouter_key
+
+# student data: names, IDs and individual answers stay local
+results/predictions_scored.csv
+*Student Analysis Report.csv

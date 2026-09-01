@@ -1,0 +1,51 @@
+{
+  "n_students": 37,
+  "q1_truth": "yes",
+  "q1_correct": 35,
+  "q3_truth": 59,
+  "median": 50,
+  "mean": 53,
+  "min": 0,
+  "max": 96,
+  "too_high": 17,
+  "too_low": 20,
+  "within_10": 7,
+  "podium": [
+    {
+      "place": 1,
+      "name": "Annie Huang",
+      "estimate": 60,
+      "off_by": 1
+    },
+    {
+      "place": 1,
+      "name": "Sonny Arden",
+      "estimate": 60,
+      "off_by": 1
+    },
+    {
+      "place": 2,
+      "name": "Max Polin",
+      "estimate": 62,
+      "off_by": 3
+    },
+    {
+      "place": 3,
+      "name": "Harshal Puranik",
+      "estimate": 54,
+      "off_by": 5
+    },
+    {
+      "place": 4,
+      "name": "Elizabeth Hsu",
+      "estimate": 50,
+      "off_by": 9
+    },
+    {
+      "place": 4,
+      "name": "Danny Weng",
+      "estimate": 50,
+      "off_by": 9
+    }
+  ]
+}

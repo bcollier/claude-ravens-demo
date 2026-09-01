@@ -103,7 +103,9 @@ def main():
       "no artificial intelligence of the kind you have been reading about. One is that "
       "kind of AI. This is what happened when they sat the same test.\n")
     w("Everything here is reproducible: every number in this document is generated "
-      "from the raw results by a script, not typed in by hand.\n")
+      "from the raw results by a script, not typed in by hand. The complete set of "
+      "instructions that produced it is in [PROMPT_HISTORY.md](PROMPT_HISTORY.md), "
+      "quoted exactly as typed.\n")
     w(f"| | Score out of {N} | |")
     w("|---|---|---|")
     w(f"| The 2017 student project | **{n_orig}** | 35% |")
@@ -349,8 +351,52 @@ def main():
       "possibly-memorised* test. The two laptop programs have no such advantage, which "
       "is one reason they are worth keeping in the comparison.\n")
 
+    # ------------------------------------------------------- sweepstake
+    ps = os.path.join(RESULTS, "predictions_summary.json")
+    if os.path.exists(ps):
+        pred = json.load(open(ps))
+        w("---\n\n## 6. The class sweepstake\n")
+        w(f"Before any code was written, {pred['n_students']} students were asked to "
+          "predict two things. Here is how they did.\n")
+        w("### \"Will it solve even one puzzle without an LLM by the end of class?\"\n")
+        w(f"**Yes — after 9 minutes and 34 seconds.** The first version of the no-LLM "
+          f"program ran at 13:08 and scored 55/96 straight away, before any learning "
+          f"was added at all.\n")
+        w(f"**{pred['q1_correct']} of {pred['n_students']} students "
+          f"({pred['q1_correct']/pred['n_students']:.0%}) called it correctly.** The "
+          "class was right to be optimistic — though as section 3 shows, getting "
+          "*something* working in ten minutes and getting it working *well* were very "
+          "different problems.\n")
+        w("### \"How many of the 96 will the non-LLM version solve?\"\n")
+        w(f"**The answer was {pred['q3_truth']}.**\n")
+        medals = {1: "🥇 **GOLD**", 2: "🥈 **SILVER**", 3: "🥉 **BRONZE**",
+                  4: "**4th**"}
+        by_place = {}
+        for e in pred["podium"]:
+            by_place.setdefault(e["place"], []).append(e)
+        w("| | Student | Guess | Off by |")
+        w("|---|---|---|---|")
+        for place in sorted(by_place):
+            group = by_place[place]
+            for k, e in enumerate(group):
+                tag = medals.get(place, f"**{place}th**")
+                if len(group) > 1:
+                    tag += " *(tie)*" if k == 0 else " *(tie)*"
+                w(f"| {tag} | **{e['name']}** | {e['estimate']} | "
+                  f"{e['off_by']} |")
+        w("")
+        w(f"Two exact ties at the top: **Annie Huang** and **Sonny Arden** both said 60 "
+          f"and were one away.\n")
+        w(f"As a group the class was well calibrated. The median guess was "
+          f"{pred['median']} against a true answer of {pred['q3_truth']}, with "
+          f"{pred['too_high']} guesses too high and {pred['too_low']} too low — almost "
+          f"exactly balanced. Only {pred['within_10']} students landed within 10, and "
+          f"the full range ran from {pred['min']} to {pred['max']}, so the *average* of "
+          f"the class beat almost every individual in it. That is a real and repeatable "
+          f"effect, and it is why prediction markets work.\n")
+
     # ------------------------------------------------------- mistakes
-    w("---\n\n## 6. Where the AI still fails\n")
+    w("---\n\n## 7. Where the AI still fails\n")
     w("This is the most useful section, because the failures are not random.\n")
     w(f"Taking the {len(strong)} models that scored 70% or better:\n")
     w(f"- **{clean} of the {N} puzzles** were solved by every single one of them.")
@@ -415,7 +461,7 @@ def main():
       "deploying one of these, do not expect it to flag its own errors.\n")
 
     # ------------------------------------------------------- takeaways
-    w("---\n\n## 7. What to take from this\n")
+    w("---\n\n## 8. What to take from this\n")
     w("**Old software is more durable than you think.** Eight-year-old code ran "
       "untouched. The expensive part of software is rarely keeping it alive; it is "
       "that its original design decides its ceiling.\n")
@@ -443,7 +489,7 @@ def main():
       "always yours.\n")
 
     # ------------------------------------------------------- technical
-    w("---\n\n## 8. Technical notes\n")
+    w("---\n\n## 9. Technical notes\n")
     w("*For readers who want to run or extend this. Everything below is optional.*\n")
     w("### Getting started\n")
     w("```bash\n"
@@ -525,6 +571,7 @@ def main():
     w("| [01_original_2017/NOTES.md](01_original_2017/NOTES.md) | the 2017 code in detail |")
     w("| [03_llm/README.md](03_llm/README.md) | the full prompt and payload |")
     w("| [PROVENANCE.md](PROVENANCE.md) | who asked for what, which models did the work |")
+    w("| [PROMPT_HISTORY.md](PROMPT_HISTORY.md) | every instruction given, verbatim, in order |")
     w("")
     w("---\n")
     w("Problems and harness from the Georgia Tech Knowledge-Based AI project, via "

@@ -2,7 +2,7 @@
 
 Three programs, written across eight years, all trying to solve the same 96 puzzles. One was written by a student in 2017. One was written this year with no artificial intelligence of the kind you have been reading about. One is that kind of AI. This is what happened when they sat the same test.
 
-Everything here is reproducible: every number in this document is generated from the raw results by a script, not typed in by hand.
+Everything here is reproducible: every number in this document is generated from the raw results by a script, not typed in by hand. The complete set of instructions that produced it is in [PROMPT_HISTORY.md](PROMPT_HISTORY.md), quoted exactly as typed.
 
 | | Score out of 96 | |
 |---|---|---|
@@ -154,7 +154,7 @@ Correct, in 4.8 seconds. Note that it did not just produce a number — it descr
 
 ## 5. The results
 
-10 different language models from 3 companies were run on the identical 96 puzzles with the identical prompt. Alongside them, the two programs that run on a laptop with no internet.
+11 different language models from 4 companies were run on the identical 96 puzzles with the identical prompt. Alongside them, the two programs that run on a laptop with no internet.
 
 | | Score | Accuracy | Cost | Time | Needs internet |
 |---|---|---|---|---|---|
@@ -162,6 +162,7 @@ Correct, in 4.8 seconds. Note that it did not just produce a number — it descr
 | **Modern program, no language model** | 59/96 | 61% | $0 | 54 s | no |
 | `gpt-5.6-sol` *(used in class)* | 93/96 | 97% | $0.78 | 77 s | yes |
 | `google/gemini-3.7-flash` | 92/96 | 96% | $1.50 | 144 s | yes |
+| `x-ai/grok-4.6` | 92/96 | 96% | $3.87 | 1794 s | yes |
 | `google/gemini-3.1-pro-preview` | 90/96 | 94% | $6.64 | 344 s | yes |
 | `anthropic/claude-fable-5` | 89/96 | 93% | $4.80 | 146 s | yes |
 | `gpt-5.6-terra` *(used in class)* | 89/96 | 93% | $1.02 | 193 s | yes |
@@ -193,14 +194,43 @@ Only partly, and it is worth being honest about. These puzzles have been in a pu
 
 ---
 
-## 6. Where the AI still fails
+## 6. The class sweepstake
+
+Before any code was written, 37 students were asked to predict two things. Here is how they did.
+
+### "Will it solve even one puzzle without an LLM by the end of class?"
+
+**Yes — after 9 minutes and 34 seconds.** The first version of the no-LLM program ran at 13:08 and scored 55/96 straight away, before any learning was added at all.
+
+**35 of 37 students (95%) called it correctly.** The class was right to be optimistic — though as section 3 shows, getting *something* working in ten minutes and getting it working *well* were very different problems.
+
+### "How many of the 96 will the non-LLM version solve?"
+
+**The answer was 59.**
+
+| | Student | Guess | Off by |
+|---|---|---|---|
+| 🥇 **GOLD** *(tie)* | **Annie Huang** | 60 | 1 |
+| 🥇 **GOLD** *(tie)* | **Sonny Arden** | 60 | 1 |
+| 🥈 **SILVER** | **Max Polin** | 62 | 3 |
+| 🥉 **BRONZE** | **Harshal Puranik** | 54 | 5 |
+| **4th** *(tie)* | **Elizabeth Hsu** | 50 | 9 |
+| **4th** *(tie)* | **Danny Weng** | 50 | 9 |
+
+Two exact ties at the top: **Annie Huang** and **Sonny Arden** both said 60 and were one away.
+
+As a group the class was well calibrated. The median guess was 50 against a true answer of 59, with 17 guesses too high and 20 too low — almost exactly balanced. Only 7 students landed within 10, and the full range ran from 0 to 96, so the *average* of the class beat almost every individual in it. That is a real and repeatable effect, and it is why prediction markets work.
+
+---
+
+## 7. Where the AI still fails
 
 This is the most useful section, because the failures are not random.
 
-Taking the 7 models that scored 70% or better:
+Taking the 8 models that scored 70% or better:
 
-- **65 of the 96 puzzles** were solved by every single one of them.
-- The **14 puzzles that two or more models missed** account for **71% of all the mistakes made**.
+- **64 of the 96 puzzles** were solved by every single one of them.
+- The **15 puzzles that two or more models missed** account for **73% of all the mistakes made**.
 - When several models miss the same puzzle, **about 63% of them choose the same wrong option** — against roughly 14% if they were guessing.
 
 Different companies, different technology, different training data, arriving at the same wrong answer. **The failures are a property of the puzzles, not of any one product.** If you are evaluating an AI tool for your own use, this is the pattern to look for: not "how often is it wrong" but "is it wrong in a predictable place".
@@ -241,7 +271,7 @@ Every model was asked to rate its own confidence. The best one reported **0.99 o
 
 ---
 
-## 7. What to take from this
+## 8. What to take from this
 
 **Old software is more durable than you think.** Eight-year-old code ran untouched. The expensive part of software is rarely keeping it alive; it is that its original design decides its ceiling.
 
@@ -257,7 +287,7 @@ Every model was asked to rate its own confidence. The best one reported **0.99 o
 
 ---
 
-## 8. Technical notes
+## 9. Technical notes
 
 *For readers who want to run or extend this. Everything below is optional.*
 
@@ -341,6 +371,7 @@ Agents one and two need no network. All numbers in this document, [COMPARISON.md
 | [01_original_2017/NOTES.md](01_original_2017/NOTES.md) | the 2017 code in detail |
 | [03_llm/README.md](03_llm/README.md) | the full prompt and payload |
 | [PROVENANCE.md](PROVENANCE.md) | who asked for what, which models did the work |
+| [PROMPT_HISTORY.md](PROMPT_HISTORY.md) | every instruction given, verbatim, in order |
 
 ---
 
