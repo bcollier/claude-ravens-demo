@@ -1,0 +1,12 @@
+model            : google/gemini-3.7-flash
+provider_route   : openrouter
+problems         : 96
+correct          : 92
+accuracy         : 0.9583
+wall_seconds     : 144.45
+workers          : 8
+cost_usd         : 1.4986
+unparseable      : 0
+input_tokens     : 1624800
+output_tokens    : 74659
+reasoning_tokens : 69216

@@ -1,0 +1,7 @@
+context-blind test (synthetic)
+  full problem                      54.7%
+  every context panel erased        14.3%   (chance ~13%)
+
+duplicate-shortcut test (real 96)
+  model picks the option most like a visible panel   29%
+  that option is actually correct                    10%

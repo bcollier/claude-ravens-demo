@@ -16,6 +16,7 @@ how far the same problem gets you across three eras of technique:
 | **[COMPARISON.md](COMPARISON.md)** | every number, per set and per problem — exactly as it ran in class |
 | **[EPILOGUE.md](EPILOGUE.md)** | added afterwards: a neural network, a 70/30 split, and one model per lab |
 | **[docs/BUILD_LOG.md](docs/BUILD_LOG.md)** | the lab notebook — 16 experiments, 6 of them dropped |
+| **[03_llm/README.md](03_llm/README.md)** | exactly what is sent to the LLM, block by block, with the prompt |
 | **[01_original_2017/NOTES.md](01_original_2017/NOTES.md)** | what the 2017 code did, what worked, what was missing |
 | **[PROVENANCE.md](PROVENANCE.md)** | the brief, the models, the environment, every judgement call |
 

@@ -205,10 +205,25 @@ def main():
       "**18.6% of training problems** and leaving eight identical panels with an "
       "unanswerable question. The loss curve looked healthy throughout. No metric "
       "reported it.\n")
-    w("A diagnostic worth copying: blanking every context panel and re-scoring drops "
-      "the network to chance on synthetic problems. So it genuinely reads the matrix "
-      "rather than exploiting a giveaway in how the distractors were made — the failure "
-      "on real problems is domain gap, not a shortcut.\n")
+    diag = os.path.join(RESULTS, "epilogue_neural_relationnet_diagnostics.txt")
+    if os.path.exists(diag):
+        w("### Two diagnostics that explain the failure\n")
+        w("```\n" + open(diag).read().strip() + "\n```\n")
+        w("**It does read the matrix.** Erase every context panel and the network drops "
+          "to chance on synthetic problems, so it is not exploiting a giveaway in how "
+          "the distractors were built — a common artefact in this literature.\n")
+        w("**But it learned the wrong rule of thumb, and the data bug is why.** Those "
+          "18.6% of broken problems had eight identical context panels, so their answer "
+          "*was* a copy of the context — trivially solvable, and quietly inflating the "
+          "synthetic score. The network duly learned to favour the option that "
+          "duplicates something already on the page. On the real 96 it does that 29% of "
+          "the time, and that option is correct only 10% of the time — worse than the "
+          "13% you would get by guessing. A heuristic that is anti-correlated with the "
+          "truth is how a model ends up *below* chance.\n")
+        w("The symbolic agent learned the opposite sign from real data: its largest "
+          "negative weight is on exactly this feature, `dup_max`. Same signal, fitted "
+          "on the real distribution instead of a broken synthetic one, and it points "
+          "the other way.\n")
     w("**A network trained on synthetic data does not reach the symbolic agent.** That "
       "is the honest result and it is worth sitting with: the relation network has to "
       "*discover* concepts like \"the outer frame is unchanged\" from pixels, with only "
@@ -305,14 +320,20 @@ def main():
           f"charged; the OpenAI-direct runs are token counts times list price.\n")
         bad_any = [r for r in allruns if r.get("unparseable")]
         if bad_any:
-            w("**\"No answer\" is a harness result, not a model result.** A reply that "
-              "cannot be parsed scores zero, and the first pass here produced some "
-              "spectacular false zeros: an 8,000-token output budget let reasoning "
-              "models spend the whole allowance thinking and return an empty message, "
-              "`gpt-4-turbo` rejects any budget above 4,096, and o-series models reject "
-              "the `max_tokens` parameter outright. All three scored 0/96 until the "
-              "harness was fixed. If you are benchmarking models, assume a suspiciously "
-              "round zero is your bug before it is theirs.\n")
+            w("**A \"no answer\" has two very different causes, and they are worth "
+              "separating.**\n")
+            w("*Yours.* The first pass here produced spectacular false zeros: an "
+              "8,000-token output budget let reasoning models spend the whole allowance "
+              "thinking and return an empty message, `gpt-4-turbo` rejects any budget "
+              "above 4,096, and o-series models reject the `max_tokens` parameter "
+              "outright. Three models scored 0/96 until the harness was fixed, and o3 "
+              "went from 72/96 with 13 truncations to 76/96 with none. If you are "
+              "benchmarking models, assume a suspiciously round zero is your bug before "
+              "it is theirs.\n")
+            w("*Theirs.* What is left after the fixes is genuine. Gemini 3.1 Pro's two "
+              "failures are degeneration loops — the reply is the word \"producing\" "
+              "repeated until the budget runs out. That is a real failure mode and it "
+              "belongs in the score.\n")
 
         w("### By problem set\n")
         w("| Model | " + " | ".join(ravens.set_label(s) for s in ravens.SET_ORDER) + " |")
@@ -327,6 +348,36 @@ def main():
       "all — not a low score, an impossible task. That is worth showing students "
       "directly: the model that made ChatGPT famous in 2022 cannot even be entered into "
       "this comparison, and the barrier is modality, not reasoning.\n")
+
+    # ---------------------------------------------------------- batch mode
+    bpath = os.path.join(RESULTS, "epilogue_batch_estimate.md")
+    if os.path.exists(bpath):
+        w("---\n\n## Would batch mode have been cheaper?\n")
+        w("Yes, and by a lot. Every provider here sells an asynchronous batch tier: you "
+          "upload a file of requests, they are worked through within a deadline "
+          "(24 hours is the usual promise, often much sooner), and you pay less per "
+          "token. OpenRouter publishes the batch rate as a separate `:batch` model id, "
+          "so the table below is not a guess &mdash; it is the token counts actually "
+          "recorded, multiplied by the published batch price.\n")
+        w("**Nothing was submitted in batch mode.** These runs were all synchronous; "
+          "this is what they would have cost.\n")
+        w(open(bpath).read().strip() + "\n")
+        w("### What you give up\n")
+        w("Latency, and nothing else. The models are identical, so accuracy would not "
+          "change. But a batch job is asynchronous: you submit and come back later. The "
+          "in-class sweep finished in 77 seconds and the results went straight onto the "
+          "screen; the same work in batch would have been cheaper and useless for that "
+          "purpose.\n")
+        w("Which makes the rule fairly clean. **A benchmark sweep is the ideal batch "
+          "workload** &mdash; 96 independent calls, no ordering, nobody waiting. **A "
+          "demo is the ideal synchronous workload.** This project happened to be both, "
+          "and paid synchronous prices for the half that did not need to.\n")
+        w("Two details worth noticing in the table. The discount is a flat 50% almost "
+          "everywhere, which suggests it is a pricing convention rather than a "
+          "measured cost saving. And `gemini-3.7-flash` is the exception at 75% off, "
+          "which takes the cheapest good model in this comparison from $1.50 to $0.37 "
+          "&mdash; four cents per correct answer, against $5.33 for the year-old "
+          "flagship it beats.\n")
 
     # ---------------------------------------------------------- cost of epilogue
     if epi.get("found"):
