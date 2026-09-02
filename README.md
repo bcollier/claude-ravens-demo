@@ -215,7 +215,11 @@ The two genuinely quick models, `gpt-4.1` and `gpt-4o` at under 3 seconds, are q
 
 ![OpenAI models on the same 96 problems, by release date](docs/openai_timeline.png)
 
-Two models released **two days apart** sit on opposite sides of the line. `gpt-4.1` scored 36 and `o3` scored 76 — because `o3` was the first of these designed to spend time working through a problem step by step before answering, rather than responding immediately. That single design change matters more here than the two years of scaling around it.
+The notes under the chart say what each release actually changed. Read them in order and one entry does nearly all the work.
+
+**Points 3 and 4 were released two days apart and sit on opposite sides of the line.** `gpt-4.1` scored 36 and `o3` scored 76. Everything `gpt-4.1` added — a million-token context, better instruction following — is worth nothing here. What `o3` added was working the problem through step by step before answering instead of responding immediately, and that is worth forty problems.
+
+The two years of scaling on either side of that step are worth far less. From `gpt-4-turbo` to `gpt-4.1` is twelve months and *two* problems. From `o3` to `gpt-5.6-sol` is fifteen months and seventeen. **The jump is a change in how the model is used at the moment you ask it, not in how big it is.** That is also why the fastest models in the previous chart are the worst ones: they are fast because they are not doing this.
 
 ### What stands out
 

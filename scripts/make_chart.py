@@ -93,15 +93,40 @@ def _recede(ax, axis):
 
 # --------------------------------------------------------------- timeline
 
+# What each release actually changed. Paraphrased from the vendor's own model
+# descriptions rather than from memory, so the newest entries stay factual.
+WHAT_CHANGED = {
+    "gpt-4-turbo": "the first GPT-4 in the API that could accept images at all",
+    "gpt-4o": "\u201comni\u201d: one model handling text and images natively, "
+              "twice as fast and half the price",
+    "gpt-4.1": "a million-token context and better instruction following \u2014 "
+               "but still answers immediately",
+    "o3": "a REASONING model: trained to work through a problem step by step "
+          "before committing to an answer",
+    "gpt-5": "step-by-step reasoning folded into the flagship line, with the "
+             "amount of thinking selectable",
+    "gpt-5.6-sol": "flagship tier of the 5.6 series, aimed at complex reasoning "
+                   "and multi-step work",
+    "gpt-5.6-terra": "the balanced mid tier of the same series, between Sol and "
+                     "the cheaper Luna",
+}
+
+
 def openai_timeline(points, baselines, out_path):
     """points: [(date, label, correct)] for one company, chronological.
        baselines: [(label, correct)] drawn as reference lines."""
     import datetime
     import matplotlib.dates as mdates
 
-    fig, ax = plt.subplots(figsize=(10, 5.2), dpi=160)
+    notes = [(i + 1, lbl, WHAT_CHANGED.get(lbl)) for i, (_, lbl, _) in enumerate(points)
+             if WHAT_CHANGED.get(lbl)]
+    note_h = 0.26 * len(notes) + 1.25          # inches the note block needs
+    fig_h = 5.0 + note_h
+    fig, ax = plt.subplots(figsize=(11, fig_h), dpi=160)
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
+    bottom = note_h / fig_h
+    fig.subplots_adjust(bottom=bottom, top=0.93)
 
     xs = [datetime.date.fromisoformat(d) for d, _, _ in points]
     ys = [c for _, _, c in points]
@@ -111,8 +136,11 @@ def openai_timeline(points, baselines, out_path):
         ax.text(xs[-1], val + 1.4, label, fontsize=9.5, color=INK_2, ha="right")
 
     ax.plot(xs, ys, color=FAMILY_COLOR["llm"], lw=2, zorder=3,
-            marker="o", markersize=9, markerfacecolor=FAMILY_COLOR["llm"],
+            marker="o", markersize=17, markerfacecolor=FAMILY_COLOR["llm"],
             markeredgecolor=SURFACE, markeredgewidth=2)
+    for i, (x, y) in enumerate(zip(xs, ys), 1):
+        ax.text(x, y, str(i), color=SURFACE, fontsize=9, fontweight="bold",
+                ha="center", va="center", zorder=5)
 
     # Place each label where it will not collide: a point that sits below its
     # neighbours gets its label underneath, a peak gets it on top, and two
@@ -143,7 +171,22 @@ def openai_timeline(points, baselines, out_path):
     ax.set_title("OpenAI models on the same 96 problems, by release date",
                  fontsize=13.5, color=INK, loc="left", pad=14)
     _recede(ax, axis="y")
-    ax.margins(x=0.09)
+    ax.margins(x=0.10)
+
+    # what each release changed, keyed to the numbered markers
+    step = 0.26 / fig_h                         # one text line, in figure units
+    y0 = bottom - 3.6 * step
+    fig.text(0.055, y0 + 1.15 * step, "WHAT CHANGED", fontsize=10, color=INK,
+             fontweight="bold", va="bottom")
+    for n, label, text in notes:
+        big = label == "o3"
+        fig.text(0.055, y0, f"{n}", fontsize=9.5, color=FAMILY_COLOR["llm"],
+                 fontweight="bold", va="bottom")
+        fig.text(0.078, y0, label, fontsize=9.5,
+                 color=INK, fontweight="bold" if big else "normal", va="bottom")
+        fig.text(0.215, y0, text, fontsize=9.5,
+                 color=INK if big else INK_2, va="bottom")
+        y0 -= step
 
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     fig.savefig(out_path, facecolor=SURFACE, bbox_inches="tight", pad_inches=0.3)
